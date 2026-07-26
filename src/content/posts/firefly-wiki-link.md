@@ -5,7 +5,7 @@ description: 在 Firefly 文章中使用 Obsidian 风格的 Wiki Link 内部链�
 image: ""
 tags: [Markdown, Obsidian, Wiki-Link, 文章示例]
 category: 文章示例
-slug: fireflt-wiki-link
+slug: firefly-wiki-link
 ---
 
 Firefly 支持在 Markdown、MDX 文章中使用 Obsidian 风格的 Wiki Link。链接目标填写文章的 slug，也就是文章相对于 `src/content/posts` 的文件路径，不需要包含扩展名。
