@@ -323,3 +323,121 @@ console.log('抱歉，你知道我在第几行吗?')
 console.log('来自第5行的问候!')
 console.log('我在第6行')
 ```
+
+## Tab 代码块
+
+由 [rehype-code-group](https://github.com/ITZSHOAIB/rehype-code-group) 提供，语法与 [VitePress 代码组](https://vitepress.dev/guide/markdown#code-groups) 一致：用 `::: code-group labels=[...]` 包裹多个代码块，即可合并成一组标签页。
+
+> [!NOTE]
+> `labels=[...]` 中的标签按顺序对应组内的代码块，用英文逗号分隔；`:::` 与 `code-group` 之间的空格不能省略。
+
+### 基本用法
+
+````markdown
+::: code-group labels=[code.js, code.py, code.html]
+
+```js
+export function greet(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+```py
+def greet(name):
+    return f"Hello, {name}!"
+```
+
+```html
+<p>Hello, world!</p>
+```
+
+:::
+````
+
+渲染效果：
+
+::: code-group labels=[code.js, code.py, code.html]
+
+```js
+export function greet(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+```py
+def greet(name):
+    return f"Hello, {name}!"
+```
+
+```html
+<p>Hello, world!</p>
+```
+
+:::
+
+### 标签中使用 Emoji
+
+标签支持 [emoji 短代码](https://github.com/omnidan/node-emoji#readme)，构建时会自动转换成 emoji：
+
+````markdown
+::: code-group labels=[:package: npm, :package: pnpm, :yarn: yarn]
+````
+
+::: code-group labels=[:package: npm, :package: pnpm, :yarn: yarn]
+
+```bash
+npm create astro@latest
+```
+
+```bash
+pnpm create astro@latest
+```
+
+```bash
+yarn create astro
+```
+
+:::
+
+### 与其他代码块特性组合
+
+组内仍是普通的 Expressive Code 代码块，标题、行号、行标记、折叠、终端框架等特性都可以照常使用。
+
+::: code-group labels=[配置文件, 终端, 折叠]
+
+```js title="astro.config.mjs" showLineNumbers {2} ins={3}
+export default {
+  theme: "firefly",
+  codeGroup: true,
+};
+```
+
+```bash title="部署"
+pnpm build && pnpm preview
+```
+
+```js collapse={1-3}
+// 这三行默认折叠
+import { a } from "a";
+import { b } from "b";
+
+console.log(a, b);
+```
+
+:::
+
+### 不止是代码块
+
+标签页内可以放任意内容，例如文字、列表或图片：
+
+::: code-group labels=[说明, 列表]
+
+这是一段普通的段落内容。
+
+- 列表项一
+- 列表项二
+
+:::
+
+> [!TIP]
+> 标签栏在构建期生成，默认展开第一项；支持鼠标点击与键盘 <kbd>←</kbd> / <kbd>→</kbd> / <kbd>Home</kbd> / <kbd>End</kbd> 切换。
