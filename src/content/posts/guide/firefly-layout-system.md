@@ -121,13 +121,19 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 #### 特点
 
 - 单列纵向排列
-- 显示文章封面图
+- 显示文章封面图，可配置在左侧或右侧
 - 展示更多文章摘要
 - 适合深度阅读
 
 #### 列表布局结构
 
 ![列表模式布局](../images/left-list.avif)
+
+#### 封面位置
+
+列表模式的封面图默认在卡片右侧，可以通过 `coverPosition` 改到左侧。改到左侧后，标题前的主题色竖线会自动隐藏（它是贴着卡片左边缘的设计），腾出的间距留给正文。
+
+网格模式的封面固定在卡片顶部，不受这项配置影响。
 
 #### 优点
 
@@ -143,8 +149,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 // src/config/siteConfig.ts
 export const siteConfig: SiteConfig = {
   postListLayout: {
-    defaultMode: "list", // 列表模式
-    allowSwitch: true,   // 允许用户切换
+    defaultMode: "list",    // 列表模式
+    coverPosition: "right", // 封面图位置："right" 右侧，"left" 左侧
   },
 };
 ```
@@ -172,7 +178,6 @@ export const siteConfig: SiteConfig = {
 export const siteConfig: SiteConfig = {
   postListLayout: {
     defaultMode: "grid",
-    allowSwitch: true,
     grid: {
       masonry: true,      // 开启瀑布流
       columnWidth: 320,   // 卡片最小宽度(px)，浏览器自动计算列数
