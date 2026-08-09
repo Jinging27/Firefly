@@ -44,3 +44,7 @@ package/
 .codex*
 .claude
 .mimocode
+
+# code intelligence indexes
+.codegraph/
+.ua/
