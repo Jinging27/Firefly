@@ -73,11 +73,18 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 是否启用主页横幅文字
 			enable: true,
 			// 主页横幅主标题
-			title: "寸进",
+			title: "无效 Blog",
 			// 主页横幅主标题字体大小
 			titleSize: "4.5rem",
 			// 主页横幅副标题
-			subtitle: "日拱一卒无有尽，功不唐捐终入海",
+			subtitle:[
+				"日拱一卒无有尽，功不唐捐终入海",
+				"从一个问题开始，走向下一个答案",
+				"反复试错，认真记录，持续生长",
+				"向未知提问，以实践作答",
+				"每解决一个问题，世界就清楚一点",
+				"记录走过的弯路，也保存得到的答案",
+			],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
 			typewriter: {
