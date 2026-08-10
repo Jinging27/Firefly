@@ -13,10 +13,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 dev-server*.log
+*.log
 
 # environment variables
 .env
 .env.production
+.env.*
+!.env.example
 
 # macOS-specific files
 .DS_Store
@@ -31,8 +34,14 @@ yarn.lock
 .idea
 *.iml
 
-# docs
-Firefly-docs/
+# local agent instructions
+AGENTS.md
+CLAUDE.md
+.agents/
+
+# internal planning artifacts (keep local, do not publish)
+/docs/blog-personalization-checklist.md
+/docs/superpowers/
 
 # lite 版本
 Firefly-Lite/
@@ -40,6 +49,14 @@ Firefly-Lite/
 cache/
 package/
 .obsidian/
+
+# local deployment and test output
+.wrangler/
+coverage/
+playwright-report/
+test-results/
+Thumbs.db
+desktop.ini
 
 # vibe coding
 .codex*
