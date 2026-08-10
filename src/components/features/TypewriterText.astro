@@ -115,15 +115,12 @@ const textData = Array.isArray(text) ? JSON.stringify(text) : text;
 
           this.timeoutId = window.setTimeout(() => this.type(), this.speed);
         } else {
-          // 打字完成，暂停后开始删除（如果有多条文本）
-          if (this.texts.length > 1) {
-            this.isDeleting = true;
-            this.timeoutId = window.setTimeout(
-              () => this.type(),
-              this.pauseTime
-            );
-          }
-          // 如果只有一条文本，保持显示不删除
+          // 打字完成，暂停后删除并重新开始；单条文本也保持动态效果。
+          this.isDeleting = true;
+          this.timeoutId = window.setTimeout(
+            () => this.type(),
+            this.pauseTime
+          );
         }
       }
     }

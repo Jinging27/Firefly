@@ -5,6 +5,7 @@ export type ProfileConfig = {
 	links: {
 		name: string;
 		url: string;
+		appUrl?: string;
 		icon: string;
 		showName?: boolean;
 	}[];
