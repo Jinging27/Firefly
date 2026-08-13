@@ -1,0 +1,25 @@
+---
+import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import DailyQuoteClient from "@/components/widget/DailyQuoteClient.svelte";
+import { dailyQuoteConfig } from "@/config";
+import type { WidgetComponentConfig } from "@/types/config";
+
+interface Props {
+	class?: string;
+	style?: string;
+	widgetConfig?: WidgetComponentConfig;
+}
+
+const { class: className, style, widgetConfig } = Astro.props;
+const showTitle = widgetConfig?.showTitle !== false;
+---
+
+<WidgetLayout
+	name={dailyQuoteConfig.title}
+	{showTitle}
+	id="daily-quote"
+	class={className}
+	{style}
+>
+	<DailyQuoteClient client:visible config={dailyQuoteConfig} />
+</WidgetLayout>
