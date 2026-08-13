@@ -1,4 +1,5 @@
 import { setMaxListeners } from "node:events";
+import { writeFile } from "node:fs/promises";
 import cloudflare from "@astrojs/cloudflare";
 import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
@@ -32,6 +33,8 @@ import {
 	fontsList,
 	mermaidConfig,
 	plantumlConfig,
+	redirectsConfig,
+	serializeCloudflareRedirects,
 	siteConfig,
 } from "./src/config";
 import I18nKey from "./src/i18n/i18nKey";
@@ -63,12 +66,26 @@ const adapter = process.env.CF_WORKERS
 		})
 	: undefined;
 
+const cloudflareRedirectsIntegration = {
+	name: "firefly-cloudflare-redirects",
+	hooks: {
+		"astro:build:done": async ({ dir }) => {
+			await writeFile(
+				new URL("_redirects", dir),
+				serializeCloudflareRedirects(redirectsConfig),
+				"utf8",
+			);
+		},
+	},
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
 
 	base: "/",
 	trailingSlash: "always",
+	redirects: redirectsConfig,
 
 	// 字体配置 - 只加载实际使用的字体，跳过未引用的以加快构建
 	fonts: (() => {
@@ -115,6 +132,7 @@ export default defineConfig({
 	},
 
 	integrations: [
+		cloudflareRedirectsIntegration,
 		swup({
 			theme: false,
 			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
