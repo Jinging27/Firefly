@@ -12,7 +12,7 @@ slug: firefly-daily-quote
 
 不过这个功能很容易越做越重：为了十几个字加载字体、每次切页都请求接口，甚至因为接口挂了留下一张空卡片。我的要求比较简单——它可以有趣，但不能拖慢博客。
 
-最后做出来的版本只在桌面端非文章页显示，位置是左侧栏的音乐播放器下面、分类上面。卡片使用系统行楷字体；在线接口不可用时显示本地文案，不会影响其他内容。
+最后做出来的版本只在桌面端非文章页显示，位置是左侧栏的音乐播放器下面、分类上面。标题与音乐卡片一样使用站点系统字体，正文和出处使用系统正楷字体；在线接口不可用时显示本地文案，不会影响其他内容。
 
 ## 先确定位置
 
@@ -167,27 +167,36 @@ Astro 外壳在 `src/components/widget/DailyQuote.astro`：
 
 因此首次直接打开平板、手机或文章页时，岛组件不可见，不会水合，也不会发起在线请求或下载 `DailyQuoteClient` 的客户端代码。如果此前已在宽屏非文章页加载，已经下载的资源不会因切换页面或缩窄窗口而撤销。
 
-## 行楷不必再下载一套字体
+## 标题和正文各司其职
 
-我希望每日一言有一点手写感，但不想为了一个侧栏卡片增加 Web Font。最后用了系统字体栈：
+每日一言的标题属于侧栏导航层级，应当和音乐卡片标题保持一致，因此不再给它设置专属字体、字号或字重，而是继续继承站点系统样式。只有 `WidgetLayout` 的内容容器使用系统正楷字体栈：
 
 ```css
-:global(widget-layout[data-id="daily-quote"]) {
+:global(widget-layout[data-id="daily-quote"] #daily-quote) {
 	font-family:
-		"STXingkai", "华文行楷", "Xingkai SC", "Kaiti SC", "STKaiti",
-		"KaiTi", "楷体", "DFKai-SB", "BiauKai", serif;
+		"Kaiti SC", "STKaiti", "KaiTi", "楷体", "DFKai-SB", "BiauKai", serif;
 }
 ```
 
-Windows、macOS 和其他系统会依次寻找本机已有字体。好处是零下载、零额外请求；缺点也很直接，不同设备上的字形不会完全一致。对这个小组件来说，我更愿意接受这种差异。
+主句和出处另加语义类，并直接使用 Tailwind 的排版尺度：
+
+```svelte
+<p class="daily-quote-text text-base leading-7 ...">{quote.text}</p>
+<p class="daily-quote-attribution text-sm leading-6 ...">...</p>
+```
+
+在组件实际显示的 1280 像素及以上宽度，主句是 16px 字号、28px 行高，出处是 14px 字号、24px 行高。Windows、macOS 和其他系统会依次寻找本机已有正楷字体，好处是零下载、零额外请求；不同设备字形可能略有差异，最后回退到衬线字体。
 
 ## 测试哪些东西
 
-数据测试覆盖内容长度、Unicode、危险控制字符、缓存损坏、超时、错误 MIME、HTTP 失败和会话去重。布局测试专门锁定下面三件事：
+数据测试覆盖内容长度、Unicode、危险控制字符、缓存损坏、超时、错误 MIME、HTTP 失败和会话去重。布局与排版测试专门锁定下面这些约束：
 
 - `dailyQuote` 在所有侧栏配置中只出现一次；
 - 左栏顺序必须是音乐、每日一言、分类；
 - 三者同属 `sticky` 分组，每日一言不进入文章页。
+- 正楷字体只作用于 `widget-layout[data-id="daily-quote"] #daily-quote`，不影响标题；
+- 字体栈不再包含行楷字体，并固定使用系统正楷回退顺序；
+- 主句固定为 `text-base leading-7`，出处固定为 `text-sm leading-6`。
 
 本地验证命令：
 
@@ -206,4 +215,4 @@ pnpm build
 
 暂时关闭功能则去 `src/config/sidebarConfig.ts` 找到 `type: "dailyQuote"`，把 `enable` 改成 `false`。关闭后组件不会渲染，在线请求自然也不会发生。
 
-这次没有加刷新按钮、切换动画和多接口轮询。每日一言只需要安静地待在音乐下面，偶尔换一句话，就够了。
+这次没有加刷新按钮、切换动画和多接口轮询。标题安静地融入侧栏，正文保留正楷阅读感，每日一言偶尔换一句话，就够了。

@@ -45,13 +45,13 @@ onMount(() => {
 </script>
 
 <div class="flex min-h-24 flex-col justify-center gap-2 py-1">
-	<p class="text-sm leading-relaxed text-neutral-700 dark:text-neutral-200">
+	<p class="daily-quote-text text-base leading-7 text-neutral-700 dark:text-neutral-200">
 		{quote.text}
 	</p>
 	<p
 		class:invisible={!quote.source && !quote.author}
 		aria-hidden={!quote.source && !quote.author ? "true" : undefined}
-		class="text-xs leading-relaxed text-neutral-500 dark:text-neutral-400"
+		class="daily-quote-attribution text-sm leading-6 text-neutral-500 dark:text-neutral-400"
 	>
 			— {quote.source ?? quote.author}{quote.source && quote.author ? ` · ${quote.author}` : ""}
 	</p>
