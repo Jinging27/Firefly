@@ -69,6 +69,16 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			showOnPostPage: true,
 		},
 		{
+			// 组件类型：每日一言组件
+			type: "dailyQuote",
+			// 是否启用该组件
+			enable: true,
+			// 组件位置
+			position: "sticky",
+			// 是否在文章详情页显示
+			showOnPostPage: false,
+		},
+		{
 			// 组件类型：分类组件
 			type: "categories",
 			// 是否启用该组件
@@ -118,16 +128,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 					limit: 2,
 				},
 			},
-		},
-		{
-			// 组件类型：每日一言组件
-			type: "dailyQuote",
-			// 是否启用该组件
-			enable: true,
-			// 组件位置
-			position: "top",
-			// 是否在文章详情页显示
-			showOnPostPage: false,
 		},
 		{
 			// 组件类型：站点统计组件
