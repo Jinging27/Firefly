@@ -164,6 +164,13 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			},
 		},
 		{
+			// 组件类型：GitHub 贡献热力图
+			type: "githubHeatmap",
+			enable: true,
+			position: "top",
+			showOnPostPage: false,
+		},
+		{
 			// 组件类型：日历组件
 			type: "calendar",
 			// 是否启用该组件
