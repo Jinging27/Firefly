@@ -1,6 +1,7 @@
 ---
 title: Firefly：用北京时间显示时间进度与节假日倒计时
 published: 2026-09-06
+updated: 2026-09-07
 description: 在 Firefly 左侧栏加入不依赖网络的年、月、周进度，并为经过核验的年度数据保留安全的节假日倒计时入口。
 image: ""
 tags: [Firefly, Astro, Svelte, 时间进度]
@@ -26,6 +27,6 @@ Astro 外壳先输出 SSR 进度，Svelte 客户端使用 `client:visible` 在�
 
 ## 验证、安全与回滚
 
-专项测试覆盖闰年、月末、周边界、周内日期编号、北京时间午夜、未核验来源、国务院官网白名单、Swup 延迟初始化/重复事件/清理以及刷新频率；运行时测试还驱动可用和不可用 `IntersectionObserver`、滚动离开/回到视口、`astro:page-load`、布局属性变化、页面可见性、媒体断点、隐藏属性、Swup 切页和卸载清理。组件测试确认没有 `fetch`、WebSocket，并检查隐藏暂停和 ARIA 进度条。当前专项命令为 `pnpm exec tsx --test src/utils/time-progress.test.ts src/utils/time-progress-lifecycle.test.ts src/components/widget/TimeProgress.test.ts`，结果 16/16 通过；`pnpm check`、`pnpm type-check`、Biome 和 `pnpm build` 均已通过，生产预览已完成桌面、移动、文章页、亮暗色和无横向溢出检查。
+专项测试覆盖闰年、月末、周边界、周内日期编号、北京时间午夜、未核验来源、国务院官网白名单、Swup 延迟初始化/重复事件/清理以及刷新频率；运行时测试还驱动可用和不可用 `IntersectionObserver`、滚动离开/回到视口、`astro:page-load`、布局属性变化、页面可见性、媒体断点、隐藏属性、Swup 切页和卸载清理。组件测试确认没有 `fetch`、WebSocket，并检查隐藏暂停和 ARIA 进度条。当前专项命令为 `pnpm exec tsx --test src/utils/time-progress.test.ts src/utils/time-progress-lifecycle.test.ts src/components/widget/TimeProgress.test.ts`，结果 16/16 通过；另同步更新每日一言的侧栏契约测试，使其覆盖 `music → dailyQuote → timeProgress → categories` 的真实顺序；全量相关测试 98/98 通过。`pnpm check`、`pnpm type-check`、Biome 和 `pnpm build` 均已通过，生产预览已完成桌面、移动、文章页、亮暗色和无横向溢出检查。
 
 回滚时删除时间进度组件、工具、配置、测试和本文，并撤销侧栏映射与配置导出即可，不影响每日一言或音乐组件。
