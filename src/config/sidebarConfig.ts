@@ -171,6 +171,13 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			showOnPostPage: false,
 		},
 		{
+			// 组件类型：本地纯色版时段问候
+			type: "timeGreeting",
+			enable: true,
+			position: "top",
+			showOnPostPage: false,
+		},
+		{
 			// 组件类型：日历组件
 			type: "calendar",
 			// 是否启用该组件

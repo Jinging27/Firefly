@@ -12,6 +12,7 @@ export type WidgetComponentType =
 	| "siteInfo"
 	| "dailyQuote"
 	| "timeProgress"
+	| "timeGreeting"
 	| "githubHeatmap"
 	| "dynamic";
 
