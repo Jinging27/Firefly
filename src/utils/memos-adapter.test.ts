@@ -284,6 +284,89 @@ describe("Memos API 安全边界", () => {
 		assert.doesNotMatch(messages.join("\n"), /实例内部敏感错误信息/);
 	});
 
+	test("非 2xx 响应正文最多读取 16 KiB，超限时保留状态码错误语义", async () => {
+		await assert.rejects(
+			withFetchMock(
+				async () =>
+					new Response("x".repeat(16 * 1024 + 1), {
+						status: 500,
+					}),
+				() => fetchMemos(`${memosUrl}/oversized-error`),
+			),
+			/Memos API 请求失败：500（响应体超过大小限制）/,
+		);
+	});
+
+	test("无 Response.body 时拒绝无界读取", async () => {
+		await assert.rejects(
+			withFetchMock(
+				async () => new Response(null, { status: 200 }),
+				() => fetchMemos(`${memosUrl}/missing-body`),
+			),
+			/Memos API 响应体不可安全读取/,
+		);
+	});
+
+	test("同配置并发 fetchMemos 只触发一次 fetch", async () => {
+		let calls = 0;
+		let resolveResponse!: (response: Response) => void;
+		const response = new Promise<Response>((resolve) => {
+			resolveResponse = resolve;
+		});
+
+		await withFetchMock(
+			async () => {
+				calls += 1;
+				return response;
+			},
+			async () => {
+				const first = fetchMemos(`${memosUrl}/dedupe-concurrent`);
+				const second = fetchMemos(`${memosUrl}/dedupe-concurrent`);
+				assert.equal(calls, 1);
+				resolveResponse(jsonResponse({ memos: [], nextPageToken: "" }));
+				await Promise.all([first, second]);
+			},
+		);
+
+		assert.equal(calls, 1);
+	});
+
+	test("成功后同配置请求可以再次执行", async () => {
+		let calls = 0;
+		await withFetchMock(
+			async () => {
+				calls += 1;
+				return jsonResponse({ memos: [], nextPageToken: "" });
+			},
+			async () => {
+				await fetchMemos(`${memosUrl}/dedupe-success`);
+				await fetchMemos(`${memosUrl}/dedupe-success`);
+			},
+		);
+		assert.equal(calls, 2);
+	});
+
+	test("失败后同配置请求可以再次执行", async () => {
+		let calls = 0;
+		await withFetchMock(
+			async () => {
+				calls += 1;
+				throw new Error("模拟网络失败");
+			},
+			async () => {
+				await assert.rejects(
+					fetchMemos(`${memosUrl}/dedupe-failure`),
+					/模拟网络失败/,
+				);
+				await assert.rejects(
+					fetchMemos(`${memosUrl}/dedupe-failure`),
+					/模拟网络失败/,
+				);
+			},
+		);
+		assert.equal(calls, 2);
+	});
+
 	test("只返回 NORMAL 且 PUBLIC 的动态", async () => {
 		const result = await withFetchMock(
 			async () =>

@@ -70,6 +70,7 @@ const MAX_MAX_ENTRIES = 300;
 const DEFAULT_TIMEOUT_MS = 3000;
 const MAX_TIMEOUT_MS = 10000;
 const MAX_RESPONSE_BYTES = 1024 * 1024;
+const MAX_ERROR_RESPONSE_BYTES = 16 * 1024;
 const MAX_MEMO_CONTENT_LENGTH = 20000;
 const MAX_MEMO_FIELD_LENGTH = 512;
 const MAX_LOCATION_LENGTH = 512;
@@ -504,12 +505,7 @@ async function readResponseText(
 	response: Response,
 	maximumBytes: number,
 ): Promise<string> {
-	if (!response.body) {
-		const text = await response.text();
-		if (new TextEncoder().encode(text).byteLength > maximumBytes)
-			throw new Error("Memos API 响应体超过大小限制");
-		return text;
-	}
+	if (!response.body) throw new Error("Memos API 响应体不可安全读取");
 
 	const reader = response.body.getReader();
 	const chunks: Uint8Array[] = [];
@@ -570,10 +566,24 @@ async function fetchMemosPage(
 			redirect: "error",
 		});
 		if (!response.ok) {
-			// 错误正文可能包含实例内部信息，不写入浏览器控制台；同时取消响应体，
-			// 避免在不需要解析时继续读取远端内容。
-			if (response.body) await response.body.cancel().catch(() => undefined);
+			// 错误正文可能包含实例内部信息，不写入浏览器控制台；只读取有限字节，
+			// 既确保响应体有明确上限，也避免超限响应继续占用内存。
+			let responseBodyError: unknown;
+			if (response.body) {
+				try {
+					await readResponseText(response, MAX_ERROR_RESPONSE_BYTES);
+				} catch (error) {
+					responseBodyError = error;
+				}
+			}
 			console.error(`[Memos API] 请求失败：${response.status}`);
+			if (
+				responseBodyError instanceof Error &&
+				responseBodyError.message === "Memos API 响应体超过大小限制"
+			)
+				throw new Error(
+					`Memos API 请求失败：${response.status}（响应体超过大小限制）`,
+				);
 			throw new Error(`Memos API 请求失败：${response.status}`);
 		}
 		const text = await readResponseText(response, MAX_RESPONSE_BYTES);
