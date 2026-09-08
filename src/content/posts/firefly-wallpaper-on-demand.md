@@ -34,6 +34,6 @@ const mobile = renderAll ? [...images.mobile] : images.mobile.slice(0, 1);
 
 ## 验证与回滚
 
-专项测试覆盖关闭轮播、开启轮播、允许切换、空数组和单图输入，并锁定媒体条件与轮播集合布局契约；本次结果为 6/6。全量测试、Biome、`pnpm check`、`pnpm type-check` 和 `pnpm build` 均通过。生产构建默认首页包含互斥媒体条件，静态证据表明桌面/移动不会同时选择对方首图；文章页和 1440/390 响应式路径保持静态构建。尚未做真实浏览器网络面板验证。
+专项测试覆盖关闭轮播、开启轮播、允许切换、空数组和单图输入，并锁定媒体条件与轮播集合布局契约；本次结果为 6/6。全量测试、Biome、`pnpm check`、`pnpm type-check` 和 `pnpm build` 均通过。生产预览浏览器 Network 实测：1440px 仅请求 d1 桌面首图，390px 仅请求 m1 移动首图；文章页返回 200，亮暗主题均保持正常。轮播和可切换路径继续保留完整集合。
 
 回滚时移除布局中的 `getRenderableBackgroundImages` 调用，恢复直接使用 `getBackgroundImages()` 即可，壁纸配置与资源无需回滚。
