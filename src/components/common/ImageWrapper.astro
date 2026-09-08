@@ -1,5 +1,5 @@
 ---
-import { Image, Picture } from "astro:assets";
+import { getImage, Image, Picture } from "astro:assets";
 import * as path from "node:path";
 import type { ImageMetadata } from "astro";
 import type { ImageFormat, ResponsiveImageLayout } from "@/types/config";
@@ -34,6 +34,8 @@ interface Props {
 	dataCoverImg?: boolean;
 	showLqip?: boolean;
 	showOverlay?: boolean;
+	/** 仅在需要按视口选择资源时设置，生成带 media 的 source。 */
+	media?: string;
 }
 
 const {
@@ -56,6 +58,7 @@ const {
 	dataCoverImg = false,
 	showLqip = true,
 	showOverlay = true,
+	media,
 } = Astro.props;
 
 const fallbackFormat = getFallbackFormat();
@@ -112,6 +115,19 @@ const responsiveProps = {
 	...(quality && { quality }),
 };
 
+const mediaImageResults =
+	media && isLocal && img
+		? await Promise.all(
+				formats.map((format) =>
+					getImage({
+						...responsiveProps,
+						src: img,
+						format,
+					} as Parameters<typeof getImage>[0]),
+				),
+			)
+		: [];
+
 // LQIP 渐变占位
 const lqipProps = isLocal
 	? getLqipProps(src, basePath)
@@ -122,7 +138,27 @@ const lqipProps = isLocal
 <div id={id} class:list={[className, 'overflow-hidden relative']}>
     {fadeIn && showLqip && <div class="lqip-placeholder absolute inset-0 pointer-events-none" style={lqipProps.style} aria-hidden="true"></div>}
     {showOverlay && <div class="transition absolute inset-0 dark:bg-black/10 pointer-events-none"></div>}
-    {isLocal && img && usePicture && (
+    {isLocal && img && media && (
+        <picture>
+            {mediaImageResults.map((image) => (
+                <source
+                    media={media}
+                    srcset={image.srcSet.values.length > 0 ? image.srcSet.attribute : image.src}
+                    type={image.options.format ? `image/${image.options.format}` : undefined}
+                />
+            ))}
+            <img
+                src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                alt={alt || ""}
+                class={imageClass}
+                style={imageStyle}
+                loading={loading}
+                fetchpriority={fetchpriority}
+                data-cover-img={dataCoverImg ? true : undefined}
+            />
+        </picture>
+    )}
+    {isLocal && img && usePicture && !media && (
         <Picture
             src={img}
             alt={alt || ""}
@@ -136,7 +172,7 @@ const lqipProps = isLocal
             {...responsiveProps}
         />
     )}
-    {isLocal && img && !usePicture && (
+    {isLocal && img && !usePicture && !media && (
         <Image
             src={img}
             alt={alt || ""}

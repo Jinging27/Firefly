@@ -23,6 +23,34 @@ test("轮播关闭且不可切换时只渲染桌面和移动首图", () => {
 	assert.notStrictEqual(result.mobile, images.mobile);
 });
 
+test("单图布局契约使用互斥的视口媒体条件", async () => {
+	const fs = await import("node:fs/promises");
+	const layout = await fs.readFile(
+		new URL("../layouts/MainGridLayout.astro", import.meta.url),
+		"utf8",
+	);
+
+	assert.match(
+		layout,
+		/src=\{backgroundImages\.mobile\[0\]\}[\s\S]{0,180}media="\(max-width: 1023px\)"/,
+	);
+	assert.match(
+		layout,
+		/src=\{backgroundImages\.desktop\[0\]\}[\s\S]{0,180}media="\(min-width: 1024px\)"/,
+	);
+});
+
+test("轮播布局契约仍遍历完整桌面和移动集合", async () => {
+	const fs = await import("node:fs/promises");
+	const layout = await fs.readFile(
+		new URL("../layouts/MainGridLayout.astro", import.meta.url),
+		"utf8",
+	);
+
+	assert.match(layout, /backgroundImages\.mobile\.map\(\(src, index\)/);
+	assert.match(layout, /backgroundImages\.desktop\.map\(\(src, index\)/);
+});
+
 test("默认开启轮播时保留全部壁纸", () => {
 	const result = getRenderableBackgroundImages(images, true, false);
 
