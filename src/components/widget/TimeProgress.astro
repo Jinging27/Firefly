@@ -1,0 +1,42 @@
+---
+import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import TimeProgressClient from "@/components/widget/TimeProgressClient.svelte";
+import { timeProgressConfig } from "@/config";
+import type { WidgetComponentConfig } from "@/types/config";
+import {
+	getBeijingMonthProgress,
+	getBeijingWeekProgress,
+	getBeijingYearProgress,
+	getNextHolidayCountdown,
+} from "@/utils/time-progress";
+
+interface Props {
+	class?: string;
+	style?: string;
+	widgetConfig?: WidgetComponentConfig;
+}
+
+const { class: className, style, widgetConfig } = Astro.props;
+const now = new Date();
+const initial = {
+	year: getBeijingYearProgress(now),
+	month: getBeijingMonthProgress(now),
+	week: getBeijingWeekProgress(now),
+	holiday: getNextHolidayCountdown(now, timeProgressConfig.holidays),
+};
+const showTitle = widgetConfig?.showTitle !== false;
+const widgetClass = [className, "time-progress-widget"]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<WidgetLayout name={timeProgressConfig.title} showTitle={showTitle} id="time-progress" class={widgetClass} {style}>
+	<TimeProgressClient client:visible initial={initial} holidays={timeProgressConfig.holidays} />
+</WidgetLayout>
+
+<style>
+	:global(.time-progress-widget) { display: none; }
+	@media (min-width: 1280px) {
+		:global(.time-progress-widget:not(.hidden)) { display: block; }
+	}
+</style>
