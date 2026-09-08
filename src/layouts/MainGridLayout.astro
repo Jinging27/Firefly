@@ -29,7 +29,11 @@ import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import { formatDateToYYYYMMDD } from "@/utils/date-utils";
 import { getImageQuality } from "@/utils/image-utils";
-import { getBackgroundImages, isHomePage } from "@/utils/layout-utils";
+import {
+	getBackgroundImages,
+	getRenderableBackgroundImages,
+	isHomePage,
+} from "@/utils/layout-utils";
 import {
 	generateGridClasses,
 	generateMainContentClasses,
@@ -63,7 +67,7 @@ interface Props {
 	};
 }
 
-const backgroundImages = getBackgroundImages();
+const allBackgroundImages = getBackgroundImages();
 
 const {
 	title,
@@ -299,6 +303,11 @@ const bannerCarouselInterval = Math.max(
 );
 const bannerCarouselEffect =
 	backgroundWallpaper.common?.carousel?.transitionEffect ?? "fade";
+const backgroundImages = getRenderableBackgroundImages(
+	allBackgroundImages,
+	bannerCarouselEnabledDefault,
+	bannerCarouselSwitchable,
+);
 const hasMultipleImages =
 	backgroundImages.desktop.length > 1 || backgroundImages.mobile.length > 1;
 ---
