@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, test } from "node:test";
+import { githubHeatmapConfig } from "../../config/githubHeatmapConfig";
 import { sidebarLayoutConfig } from "../../config/sidebarConfig";
 
 const heatmapAstro = readFileSync(
@@ -51,6 +52,11 @@ describe("GitHub 贡献热力图侧栏契约", () => {
 		assert.match(heatmapClient, /createGitHubHeatmapLoader/);
 		assert.doesNotMatch(heatmapAstro, /fetch\(|XMLHttpRequest|WebSocket/);
 		assert.doesNotMatch(heatmapClient, /credentials:\s*["']include/);
+	});
+
+	test("外部接口使用足够的冷启动超时并保留失败降级", () => {
+		assert.ok(githubHeatmapConfig.requestTimeoutMs >= 5_000);
+		assert.match(heatmapClient, /暂时无法显示贡献记录/);
 	});
 
 	test("网格在侧栏中保持可压缩且不强制溢出", () => {
