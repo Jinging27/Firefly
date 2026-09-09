@@ -31,7 +31,7 @@ describe("每日一言侧栏布局", () => {
 				leftTypes.indexOf("music"),
 				leftTypes.indexOf("categories") + 1,
 			),
-			["music", "dailyQuote", "timeProgress", "categories"],
+			["music", "dailyQuote", "categories"],
 		);
 	});
 

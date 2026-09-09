@@ -17,7 +17,7 @@ const timeProgressLifecycle = readFileSync(
 );
 
 describe("时间进度侧栏布局", () => {
-	test("只在左栏配置一次，顺序固定在每日一言和分类之间", () => {
+	test("不再作为左栏独立卡片注册，改由右侧日历承载", () => {
 		const leftTypes = sidebarLayoutConfig.leftComponents.map(
 			(component) => component.type,
 		);
@@ -28,23 +28,29 @@ describe("时间进度侧栏布局", () => {
 				(component) => component.type,
 			),
 		];
-		assert.equal(allTypes.filter((type) => type === "timeProgress").length, 1);
+		assert.equal(allTypes.filter((type) => type === "timeProgress").length, 0);
 		assert.deepEqual(
 			leftTypes.slice(
 				leftTypes.indexOf("music"),
 				leftTypes.indexOf("categories") + 1,
 			),
-			["music", "dailyQuote", "timeProgress", "categories"],
+			["music", "dailyQuote", "categories"],
+		);
+		assert.equal(
+			sidebarLayoutConfig.rightComponents.some(
+				(component) => component.type === "calendar",
+			),
+			true,
 		);
 	});
 
 	test("仅桌面非文章页可见，并按倒计时状态安排刷新", () => {
-		const config = sidebarLayoutConfig.leftComponents.find(
-			(component) => component.type === "timeProgress",
+		const calendar = sidebarLayoutConfig.rightComponents.find(
+			(component) => component.type === "calendar",
 		);
-		assert.ok(config);
-		assert.equal(config.position, "sticky");
-		assert.equal(config.showOnPostPage, false);
+		assert.ok(calendar);
+		assert.equal(calendar.position, "sticky");
+		assert.equal(calendar.showOnPostPage, false);
 		assert.match(timeProgressAstro, /@media \(min-width: 1280px\)/);
 		assert.match(timeProgressAstro, /client:visible/);
 		assert.match(timeProgressLifecycle, /getTimeProgressRefreshDelay\(true\)/);

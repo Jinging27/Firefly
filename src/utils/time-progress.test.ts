@@ -5,6 +5,7 @@ import {
 	getBeijingWeekProgress,
 	getBeijingYearProgress,
 	getNextHolidayCountdown,
+	getNextSpringFestivalCountdown,
 	hasOfficialHolidaySource,
 } from "./time-progress";
 
@@ -53,6 +54,31 @@ describe("北京时间进度", () => {
 });
 
 describe("节日倒计时", () => {
+	test("优先选择当前年份距离最近的已核验公共节日", () => {
+		const countdown = getNextHolidayCountdown(beijingDate(2026, 9, 9), [
+			{
+				name: "中秋节",
+				date: "2026-09-25",
+				source: "国务院办公厅关于2026年部分节假日安排的通知",
+				sourceUrl:
+					"https://www.gov.cn/zhengce/zhengceku/202511/content_7047091.htm",
+				verified: true,
+				coverageYears: [2026],
+			},
+			{
+				name: "国庆节",
+				date: "2026-10-01",
+				source: "国务院办公厅关于2026年部分节假日安排的通知",
+				sourceUrl:
+					"https://www.gov.cn/zhengce/zhengceku/202511/content_7047091.htm",
+				verified: true,
+				coverageYears: [2026],
+			},
+		]);
+		assert.equal(countdown?.holiday.name, "中秋节");
+		assert.equal(countdown?.milliseconds, 16 * 24 * 60 * 60 * 1000);
+	});
+
 	test("只从覆盖当前年份的可审计数据中选择下一节日", () => {
 		const countdown = getNextHolidayCountdown(beijingDate(2026, 9, 6), [
 			{
@@ -135,5 +161,25 @@ describe("节日倒计时", () => {
 			}),
 			true,
 		);
+	});
+
+	test("春节使用本地审核日期，并与最近公共节日分开计算", () => {
+		const springFestival = {
+			name: "春节",
+			date: "2027-02-06",
+			source: "农历春节日期（本地审核数据）",
+			verified: true,
+			coverageYears: [2027],
+			kind: "springFestival" as const,
+		};
+		assert.equal(
+			getNextHolidayCountdown(beijingDate(2026, 9, 9), [springFestival]),
+			null,
+		);
+		const countdown = getNextSpringFestivalCountdown(beijingDate(2026, 9, 9), [
+			springFestival,
+		]);
+		assert.equal(countdown?.holiday.name, "春节");
+		assert.equal(countdown?.milliseconds, 150 * 24 * 60 * 60 * 1000);
 	});
 });

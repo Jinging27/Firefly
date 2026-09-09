@@ -1,10 +1,19 @@
 ---
 import { Icon } from "astro-icon/components";
 import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import TimeProgressClient from "@/components/widget/TimeProgressClient.svelte";
+import { timeProgressConfig } from "@/config";
 import { siteConfig } from "@/config/siteConfig";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import type { WidgetComponentConfig } from "@/types/config";
+import {
+	getBeijingMonthProgress,
+	getBeijingWeekProgress,
+	getBeijingYearProgress,
+	getNextHolidayCountdown,
+	getNextSpringFestivalCountdown,
+} from "@/utils/time-progress";
 import { url } from "@/utils/url-utils";
 
 interface Props {
@@ -56,6 +65,17 @@ const currentLang = siteConfig.lang || "en";
 
 const calendarDataUrl = url("/api/allPostMeta.json");
 const postUrlPrefix = url("/posts/");
+const now = new Date();
+const timeProgressInitial = {
+	year: getBeijingYearProgress(now),
+	month: getBeijingMonthProgress(now),
+	week: getBeijingWeekProgress(now),
+	holiday: getNextHolidayCountdown(now, timeProgressConfig.holidays),
+	springFestival: getNextSpringFestivalCountdown(
+		now,
+		timeProgressConfig.springFestivals,
+	),
+};
 ---
 
 <WidgetLayout name={i18n(I18nKey.calendar)} showTitle={showTitle} id="calendar-widget" class={className} style={style}>
@@ -90,6 +110,18 @@ const postUrlPrefix = url("/posts/");
       <div class="calendar-grid grid grid-cols-7 gap-1 pb-1" id="calendar-grid">
         <!-- 将由 JavaScript 填充 -->
       </div>
+    </div>
+
+    <div data-time-progress-widget class="calendar-time-progress mt-3 border-t border-neutral-200 pt-3 dark:border-neutral-700">
+      <div class="mb-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">时间进度</div>
+      <TimeProgressClient
+        client:visible
+        initial={timeProgressInitial}
+        holidays={timeProgressConfig.holidays}
+        springFestivals={timeProgressConfig.springFestivals}
+        showWeek={false}
+        showEmptyCountdown={true}
+      />
     </div>
 
     <!-- 年度文章热力图 -->
