@@ -29,7 +29,11 @@ import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import { formatDateToYYYYMMDD } from "@/utils/date-utils";
 import { getImageQuality } from "@/utils/image-utils";
-import { getBackgroundImages, isHomePage } from "@/utils/layout-utils";
+import {
+	getBackgroundImages,
+	getRenderableBackgroundImages,
+	isHomePage,
+} from "@/utils/layout-utils";
 import {
 	generateGridClasses,
 	generateMainContentClasses,
@@ -63,7 +67,7 @@ interface Props {
 	};
 }
 
-const backgroundImages = getBackgroundImages();
+const allBackgroundImages = getBackgroundImages();
 
 const {
 	title,
@@ -299,6 +303,11 @@ const bannerCarouselInterval = Math.max(
 );
 const bannerCarouselEffect =
 	backgroundWallpaper.common?.carousel?.transitionEffect ?? "fade";
+const backgroundImages = getRenderableBackgroundImages(
+	allBackgroundImages,
+	bannerCarouselEnabledDefault,
+	bannerCarouselSwitchable,
+);
 const hasMultipleImages =
 	backgroundImages.desktop.length > 1 || backgroundImages.mobile.length > 1;
 ---
@@ -399,6 +408,7 @@ const hasMultipleImages =
                     alt="Mobile background image of the blog"
                     class="object-cover h-full w-full"
                     src={backgroundImages.mobile[0]}
+                    media="(max-width: 1023px)"
                     position={backgroundWallpaper.banner?.position}
                     widths={[640, 1080]}
                     sizes="100vw"
@@ -415,6 +425,7 @@ const hasMultipleImages =
                     alt="Desktop background image of the blog"
                     class="object-cover h-full"
                     src={backgroundImages.desktop[0]}
+                    media="(min-width: 1024px)"
                     position={backgroundWallpaper.banner?.position}
                     widths={[1280, 1920]}
                     sizes="100vw"

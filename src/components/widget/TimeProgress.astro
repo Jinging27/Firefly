@@ -8,6 +8,7 @@ import {
 	getBeijingWeekProgress,
 	getBeijingYearProgress,
 	getNextHolidayCountdown,
+	getNextSpringFestivalCountdown,
 } from "@/utils/time-progress";
 
 interface Props {
@@ -23,6 +24,10 @@ const initial = {
 	month: getBeijingMonthProgress(now),
 	week: getBeijingWeekProgress(now),
 	holiday: getNextHolidayCountdown(now, timeProgressConfig.holidays),
+	springFestival: getNextSpringFestivalCountdown(
+		now,
+		timeProgressConfig.springFestivals,
+	),
 };
 const showTitle = widgetConfig?.showTitle !== false;
 const widgetClass = [className, "time-progress-widget"]
@@ -31,7 +36,14 @@ const widgetClass = [className, "time-progress-widget"]
 ---
 
 <WidgetLayout name={timeProgressConfig.title} showTitle={showTitle} id="time-progress" class={widgetClass} {style}>
-	<TimeProgressClient client:visible initial={initial} holidays={timeProgressConfig.holidays} />
+	<div data-time-progress-widget>
+	<TimeProgressClient
+		client:visible
+		initial={initial}
+		holidays={timeProgressConfig.holidays}
+		springFestivals={timeProgressConfig.springFestivals}
+	/>
+	</div>
 </WidgetLayout>
 
 <style>

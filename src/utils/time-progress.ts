@@ -123,7 +123,39 @@ export function getNextHolidayCountdown(
 	const candidates = holidays
 		.filter(
 			(holiday) =>
+				holiday.kind !== "springFestival" &&
 				hasOfficialHolidaySource(holiday) &&
+				(holiday.coverageYears.includes(year) ||
+					holiday.coverageYears.includes(year + 1)),
+		)
+		.map((holiday) => ({ holiday, timestamp: parseHolidayDate(holiday.date) }))
+		.filter(
+			(candidate): candidate is { holiday: Holiday; timestamp: number } =>
+				candidate.timestamp !== null,
+		)
+		.filter((candidate) => candidate.timestamp >= now.getTime())
+		.filter((candidate) =>
+			candidate.holiday.coverageYears.includes(
+				new Date(candidate.timestamp + BEIJING_OFFSET_MS).getUTCFullYear(),
+			),
+		)
+		.sort((left, right) => left.timestamp - right.timestamp);
+	const next = candidates[0];
+	return next
+		? { holiday: next.holiday, milliseconds: next.timestamp - now.getTime() }
+		: null;
+}
+
+export function getNextSpringFestivalCountdown(
+	now: Date = new Date(),
+	springFestivals: readonly Holiday[] = [],
+): HolidayCountdown | null {
+	const { year } = getBeijingParts(now);
+	const candidates = springFestivals
+		.filter(
+			(holiday) =>
+				holiday.kind === "springFestival" &&
+				holiday.verified === true &&
 				(holiday.coverageYears.includes(year) ||
 					holiday.coverageYears.includes(year + 1)),
 		)

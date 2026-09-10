@@ -79,13 +79,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			showOnPostPage: false,
 		},
 		{
-			// 组件类型：时间进度与节假日倒计时
-			type: "timeProgress",
-			enable: true,
-			position: "sticky",
-			showOnPostPage: false,
-		},
-		{
 			// 组件类型：分类组件
 			type: "categories",
 			// 是否启用该组件
