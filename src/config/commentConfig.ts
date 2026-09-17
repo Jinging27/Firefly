@@ -1,6 +1,19 @@
 import type { CommentConfig } from "../types/commentConfig";
 
 export const commentConfig: CommentConfig = {
-	// 尚未配置评论服务，填写本站真实服务信息后再启用。
-	type: "none",
+	// 使用 GitHub Discussions 承载评论，不需要在博客中保存 Token 或 Cookie。
+	type: "giscus",
+	giscus: {
+		repo: "Jinging27/Firefly",
+		repoId: "R_kgDOTyvXLQ",
+		category: "Announcements",
+		categoryId: "DIC_kwDOTyvXLc4DFz6S",
+		mapping: "pathname",
+		strict: "0",
+		reactionsEnabled: "1",
+		emitMetadata: "0",
+		inputPosition: "bottom",
+		lang: "zh-CN",
+		loading: "lazy",
+	},
 };
