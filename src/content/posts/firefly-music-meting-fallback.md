@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：让 Meting 音乐接口超时后自动降级
 published: 2026-09-17
-updated: 2026-09-17
+updated: 2026-09-18
 description: 记录 Firefly 音乐播放器如何限制 Meting 请求等待时间、自动切换备用接口，并在全部失败时结束加载态。
 image: ""
 tags: [Firefly, 音乐, Meting, 性能]
@@ -15,7 +15,7 @@ Firefly 的 `mode: "meting"` 会让浏览器请求第三方 Meting API。如果�
 
 这次改造给每个接口增加了超时取消：主接口在限定时间内没有完成，就中止请求并继续尝试备用接口；所有接口都失败时，播放器结束加载态并显示错误，不会把整页卡住。
 
-## 小白跟做步骤
+## 实施步骤
 
 先复制项目目录或新建分支。依赖未安装时在项目根目录运行 `pnpm install`。本教程只改音乐配置和音乐管理器，不要把第三方 Token、Cookie 或代理扩展写进博客。
 

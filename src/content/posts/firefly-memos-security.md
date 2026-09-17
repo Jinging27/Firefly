@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：为 Memos 动态建立内容安全边界
 published: 2026-09-07
-updated: 2026-09-17
+updated: 2026-09-18
 description: 从远端 Markdown 转义、链接协议、同源图片和请求限制入手，记录 Firefly Memos 适配器的安全改造与验收边界。
 image: ""
 tags: [Firefly, Memos, 安全]
@@ -26,7 +26,7 @@ Memos 是一个可以自己部署的轻量笔记/动态服务。你在 Memos 后
 
 本教程完成的是适配器安全加固，不是打开开关。没有真实 Memos 实例、版本和浏览器联调证据前，继续关闭是有意的安全选择。
 
-## 小白跟做步骤
+## 实施步骤
 
 如果你的目标只是“先让博客正常运行”，不要开启 Memos：确认 `src/config/dynamicConfig.ts` 使用 `apiUrl: "/api/dynamic.json"`，然后运行 `pnpm check`、`pnpm type-check` 和 `pnpm build`。
 

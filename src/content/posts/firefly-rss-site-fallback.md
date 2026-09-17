@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：让 RSS 域名统一跟随站点配置
 published: 2026-09-07
-updated: 2026-09-17
+updated: 2026-09-18
 description: 清理 Firefly RSS 路由中的上游演示域名兜底，让异常路径也统一读取本站 siteConfig.site_url，并用专项测试和构建产物验证结果。
 image: ""
 tags: [Firefly, Astro, RSS, 配置]
@@ -15,7 +15,7 @@ slug: firefly-rss-site-fallback
 
 这次魔改只做一件事：让 RSS 的正常路径和异常兜底都回到同一个站点配置源。
 
-## 小白跟做步骤
+## 实施步骤
 
 先备份项目或新建分支。依赖未安装时运行 `pnpm install`。这项修改只涉及 RSS 的域名兜底，不需要新增 API、环境变量或浏览器脚本。
 

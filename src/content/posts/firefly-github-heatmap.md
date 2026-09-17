@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：添加客户端缓存的 GitHub 贡献热力图
 published: 2026-09-06
-updated: 2026-09-17
+updated: 2026-09-18
 description: 使用现有 GitHub 链接和公开数据，在 Firefly 右侧栏显示轻量贡献热力图。
 image: ""
 tags: [Firefly, GitHub, Astro, Svelte]
@@ -11,7 +11,7 @@ slug: firefly-github-heatmap
 
 GitHub 热力图适合放在侧栏，但不应该让静态博客在构建时冻结贡献数据，也不应该把 Token 放进浏览器。这个实现从现有个人资料链接提取用户名，客户端按需读取公开 JSON，并在失败时保持空状态。组件配置在右侧栏，默认只出现在宽屏非文章页。右侧日历中的年度文章热力图现在默认关闭，因此两者不会重复占用同一块信息空间。
 
-## 小白跟做步骤
+## 实施步骤
 
 先备份项目或新建分支。项目根目录没有依赖时运行 `pnpm install`。这项功能只需要公开 GitHub 用户名，不需要 Token，也不要把 Token 粘贴到浏览器代码里。
 

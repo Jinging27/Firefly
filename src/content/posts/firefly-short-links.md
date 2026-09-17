@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：加入安全的站点短链接
 published: 2026-08-14
-updated: 2026-09-17
+updated: 2026-09-18
 description: 用一份配置同时生成 Astro 静态跳转页和 Cloudflare 301，并限制短链路径与目标地址的安全边界。
 image: ""
 tags: [Firefly, Astro, Cloudflare, 短链接]
@@ -15,7 +15,7 @@ slug: firefly-short-links
 
 这次实现刻意把范围收得很窄：只支持明确列出的静态短链，只允许永久重定向 `301`，并在构建前拒绝不规范或容易产生歧义的路径。
 
-## 小白跟做步骤
+## 实施步骤
 
 先备份项目或新建分支。依赖未安装时运行 `pnpm install`。短链不需要数据库、第三方短链平台或前端脚本，所有规则都写在仓库里。
 

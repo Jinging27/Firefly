@@ -28,7 +28,10 @@ describe("Giscus 评论配置契约", () => {
 
 	test("继续使用 Web Component 和延迟加载，不粘贴账号凭据", () => {
 		assert.match(giscusSource, /<giscus-widget/);
-		assert.match(giscusSource, /import\("https:\/\/esm\.sh\/giscus"\)/);
+		assert.match(
+			giscusSource,
+			/import\("https:\/\/esm\.sh\/giscus@1\.6\.0\?bundle"\)/,
+		);
 		assert.doesNotMatch(giscusSource, /client\.js/);
 		assert.doesNotMatch(giscusSource, /token|cookie|password/i);
 	});

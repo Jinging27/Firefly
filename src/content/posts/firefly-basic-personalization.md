@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：从模板默认值到自己的博客身份
 published: 2026-09-07
-updated: 2026-09-17
+updated: 2026-09-18
 description: 记录 Firefly 博客基础个性化的配置入口、来源保留、验证方法和安全边界。
 image: ""
 tags: [Firefly, Astro, 博客配置, 个性化]
@@ -11,7 +11,7 @@ slug: firefly-basic-personalization
 
 Firefly 提供了完整的博客骨架，但第一次部署后，站点标题、头像、友链、赞赏页和首页横幅仍可能带着模板示例。基础个性化的目标不是重写主题，而是把这些身份信息集中替换为本站真实资料，同时保留 Firefly/Fuwari 的开源来源。
 
-## 小白跟做步骤
+## 实施步骤
 
 先复制项目目录或新建分支。依赖未安装时在项目根目录运行 `pnpm install`。这篇文章只修改配置和个人内容，不需要先改组件源码。
 

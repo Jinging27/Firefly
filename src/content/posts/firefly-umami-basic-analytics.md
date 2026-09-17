@@ -1,7 +1,7 @@
 ---
 title: Firefly 魔改：接入 Umami 页面访问、外链点击和 Web Vitals
 published: 2026-09-17
-updated: 2026-09-17
+updated: 2026-09-18
 description: 在 Firefly 中以生产环境门控的方式接入 Umami 基础统计，记录页面访问、外部链接点击和 Web Vitals，同时保持会话回放及其他统计平台关闭。
 image: ""
 tags: [Firefly, Umami, 统计, Web Vitals]
@@ -23,9 +23,22 @@ slug: firefly-umami-basic-analytics
 
 Umami 是网站访问分析工具。它能告诉你哪些页面被访问、站外链接是否被点击，以及页面在真实浏览器中的性能表现。Website ID 只是公开站点标识，不是密码；不要把 Umami 登录密码、Cookie 或 API Token 写入博客。
 
-## 小白跟做步骤
+## 实施步骤
 
-### 1. 创建 Umami Cloud 网站
+### 1. 准备项目和统计站点
+
+在项目根目录执行：
+
+```powershell
+git status --short
+git switch -c codex/umami-basic-analytics
+$backup = Join-Path $env:TEMP ("firefly-analyticsConfig-" + (Get-Date -Format "yyyyMMdd-HHmmss") + ".ts")
+Copy-Item "src/config/analyticsConfig.ts" $backup
+```
+
+如果项目还没有依赖，先执行 `pnpm install`。备份文件放在系统临时目录，不要把 `.bak`、日志、`dist/` 或 `.env` 加入仓库。
+
+### 2. 创建 Umami Cloud 网站
 
 打开 [Umami Cloud](https://cloud.umami.is/)，注册并登录。创建 Website 时填写自己最终部署的域名，例如：
 
@@ -33,9 +46,9 @@ Umami 是网站访问分析工具。它能告诉你哪些页面被访问、站�
 blog.example.com
 ```
 
-创建后进入 Website 设置，复制 **Website ID**。每个人都必须使用自己的 ID；不要直接复制本文示例站点的 ID，否则访问数据会写入别人的统计面板。
+创建后进入该 Website 的 **Settings/设置**，复制 **Website ID**。每个人都必须使用自己的 ID；不要直接复制本文示例站点的 ID，否则访问数据会写入别人的统计面板。Website 的域名要与 Cloudflare 最终访问域名一致，带 `www` 与不带 `www` 应按实际部署情况选择。
 
-### 2. 修改配置文件
+### 3. 修改配置文件
 
 打开 `src/config/analyticsConfig.ts`，将 `你的 Website ID` 替换为刚复制的值：
 
@@ -61,9 +74,9 @@ export const analyticsConfig: AnalyticsConfig = {
 };
 ```
 
-当前示例仓库的实际 ID 已写入本项目配置，但复刻到自己的博客时必须换成自己的 ID。除了 Website ID，不需要任何账号密钥。
+当前示例仓库的实际 ID 已写入本项目配置，但迁移到自己的博客时必须换成自己的 ID。除了 Website ID，不需要任何账号密钥。只修改 `src/config/analyticsConfig.ts`，不要为了接入统计改动 `Layout.astro` 或新增第二套统计脚本。
 
-### 3. 理解生产环境门控
+### 4. 理解生产环境门控
 
 `src/layouts/Layout.astro` 中有：
 
@@ -73,7 +86,7 @@ const isProduction = import.meta.env.PROD;
 
 统计组件只有在 `isProduction` 为 `true` 且 Website ID 非空时才输出。这样本地 `pnpm dev` 刷新页面不会污染正式数据，Cloudflare Pages 的正式构建仍会正常加载 Umami。
 
-### 4. 运行检查
+### 5. 运行检查
 
 在项目根目录 PowerShell 中执行：
 
@@ -85,6 +98,8 @@ pnpm exec biome check src/config/analyticsConfig.ts src/config/analyticsConfig.t
 pnpm build
 pnpm dev
 ```
+
+`pnpm dev` 只用于检查本地门控；正式数据验收必须使用 `pnpm build` 后的 `pnpm preview` 或 Cloudflare Pages 部署结果。
 
 ## 改完后应该看到什么
 
