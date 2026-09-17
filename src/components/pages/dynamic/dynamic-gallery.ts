@@ -1,10 +1,58 @@
-import * as FancyboxModule from "@fancyapps/ui";
-
 type GalleryImage = {
 	alt: string;
 	element: HTMLImageElement;
 	src: string;
 };
+
+type FancyboxApi = {
+	show: (
+		items: Array<{ src: string; type: "image"; caption: string }>,
+		options: { startIndex: number },
+	) => void;
+};
+
+export type DynamicGalleryImage = Pick<GalleryImage, "alt" | "src">;
+
+export function createFancyboxLoader(
+	importFancybox: () => Promise<FancyboxApi> = () =>
+		import("@fancyapps/ui").then((module) => module.Fancybox),
+): () => Promise<FancyboxApi> {
+	let fancyboxPromise: Promise<FancyboxApi> | undefined;
+
+	return () => {
+		if (!fancyboxPromise) {
+			fancyboxPromise = importFancybox().catch((error) => {
+				fancyboxPromise = undefined;
+				throw error;
+			});
+		}
+		return fancyboxPromise;
+	};
+}
+
+const loadFancybox = createFancyboxLoader();
+
+export async function openDynamicGalleryLightbox(
+	load: () => Promise<FancyboxApi>,
+	images: readonly DynamicGalleryImage[],
+	index: number,
+	reportError: (error: unknown) => void = (error) =>
+		console.warn("[DynamicGallery] Failed to open Fancybox:", error),
+): Promise<void> {
+	try {
+		const Fancybox = await load();
+		Fancybox.show(
+			images.map((image) => ({
+				src: image.src,
+				type: "image" as const,
+				caption: image.alt,
+			})),
+			{ startIndex: index },
+		);
+	} catch (error) {
+		reportError(error);
+	}
+}
 
 export function registerDynamicGallery(): void {
 	if (customElements.get("dynamic-gallery")) return;
@@ -126,17 +174,7 @@ export function registerDynamicGallery(): void {
 				"click",
 				(event) => {
 					event.preventDefault();
-					const Fancybox = FancyboxModule.Fancybox;
-					Fancybox.show(
-						this.images.map((image) => ({
-							src: image.src,
-							type: "image",
-							caption: image.alt,
-						})),
-						{
-							startIndex: this.activeIndex,
-						},
-					);
+					void this.openLightbox(this.activeIndex);
 				},
 			);
 		}
@@ -158,16 +196,8 @@ export function registerDynamicGallery(): void {
 			viewer.hidden = true;
 		}
 
-		private openLightbox(index: number) {
-			const Fancybox = FancyboxModule.Fancybox;
-			Fancybox.show(
-				this.images.map((image) => ({
-					src: image.src,
-					type: "image",
-					caption: image.alt,
-				})),
-				{ startIndex: index },
-			);
+		private async openLightbox(index: number) {
+			await openDynamicGalleryLightbox(loadFancybox, this.images, index);
 		}
 
 		private select(index: number) {

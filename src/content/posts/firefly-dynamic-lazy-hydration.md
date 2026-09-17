@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：让动态侧栏进入视口后再加载
 published: 2026-09-07
+updated: 2026-09-17
 description: 记录 Firefly 如何把动态侧栏从页面加载即水合调整为可见时水合，减少首屏客户端工作而不改变动态数据逻辑。
 image: ""
 tags: [Firefly, 性能, 动态侧栏]
@@ -8,7 +9,7 @@ category: Firefly
 slug: firefly-dynamic-lazy-hydration
 ---
 
-动态侧栏通常不是页面第一屏的核心内容，但使用 `client:load` 时，页面一打开就会初始化 Svelte 组件并请求动态数据。这个改造只调整 Astro 的加载时机：把动态组件改为进入视口后再水合，保留所有原有数据和错误处理。
+动态侧栏通常不是页面第一屏的核心内容，但使用 `client:load` 时，页面一打开就会初始化 Svelte 组件并请求动态数据。这个改造分成两个相互独立的边界：侧栏使用 `client:visible` 延迟水合；动态页中的图片画廊则只在用户真正打开灯箱时加载 Fancybox。这样灯箱依赖暂时不可用时，不会让动态数据组件停在“正在加载”。
 
 ## 改动位置
 
@@ -20,18 +21,41 @@ slug: firefly-dynamic-lazy-hydration
 
 原来的 `client:load` 会在页面加载时立即初始化；`client:visible` 则由 Astro 在组件可见时启动。`apiUrl`、`limit` 和 `memos` 三个参数没有改变。
 
+动态页的图片画廊入口是 `src/components/pages/dynamic/dynamic-gallery.ts`。它不再在模块顶层静态导入 `@fancyapps/ui`，也不会被全局 `FancyboxManager` 在画廊渲染时接管；只有点击灯箱按钮后才会动态导入。同时点击时会共用一个进行中的请求，成功后继续复用缓存的结果；若加载失败则清空缓存，下次点击可以重试：
+
+```ts
+function createFancyboxLoader(importFancybox = () =>
+	import("@fancyapps/ui").then((module) => module.Fancybox),
+) {
+	let fancyboxPromise: Promise<FancyboxApi> | undefined;
+	return () => {
+		if (!fancyboxPromise) {
+			fancyboxPromise = importFancybox().catch((error) => {
+				fancyboxPromise = undefined;
+				throw error;
+			});
+		}
+		return fancyboxPromise;
+	};
+}
+```
+
+动态页本身仍按原流程请求 `/api/dynamic.json`，先渲染文本、筛选和分页；只有点击图片灯箱时才需要 Fancybox。导入失败时只会记录灯箱错误，不会产生未处理的 Promise 异常，也不会影响动态文本、搜索、年份筛选或分页。
+
 ## 为什么不重写动态组件
 
-动态数据可能来自本地 `/api/dynamic.json`，也可能在未来通过已经加固的 Memos 适配器提供。为了避免引入新的请求策略或重复安全逻辑，本次只改变水合指令，`DynamicSidebar.svelte` 的加载态、错误态、HTML 清洗后的文本摘要、图片懒加载和链接全部保持原样。
+动态数据可能来自本地 `/api/dynamic.json`，也可能在未来通过已经加固的 Memos 适配器提供。为了避免引入新的请求策略或重复安全逻辑，本次只改变水合指令和画廊依赖的加载时机，`DynamicSidebar.svelte`/`DynamicFeed.svelte` 的数据、加载态、错误态、HTML 清洗后的文本摘要、图片懒加载和链接保持原样。
+
+此前如果 Fancybox 的开发优化依赖请求失败，模块加载错误会在动态组件水合前抛出，导致 `loading` 状态无法结束。延迟导入后，动态列表不再依赖灯箱模块完成水合；灯箱单独失败时只影响图片放大，不影响文字动态、搜索或年份筛选。
 
 ## 对性能的影响
 
-用户没有滚动到动态侧栏时，不会提前初始化这个 Svelte 岛，也不会提前执行它的首次请求。进入视口后仍然使用原有一次加载流程，没有轮询、动画或新增依赖。这个改造不能替代真实性能监测，但它减少了非首屏组件的即时工作。
+用户没有滚动到动态侧栏时，不会提前初始化这个 Svelte 岛，也不会提前执行它的首次请求。进入视口后仍然使用原有一次加载流程；动态页首屏也不会下载 Fancybox 灯箱代码。点击图片后才加载一次并复用结果，没有轮询、动画或新增运行时依赖。选择器契约测试使用开发期的 `css-select` 与 `htmlparser2`，它们不会进入网站运行时模块。这个改造不能替代真实性能监测，但它减少了非首屏组件的即时工作。
 
 ## 兼容性与降级
 
-Astro 的 `client:visible` 负责可见性观察；动态组件自身仍保留加载中、空数据和请求失败状态。即使本地 API 或未来 Memos 服务不可用，也只影响卡片内容，不会阻断其他页面。
+Astro 的 `client:visible` 负责侧栏可见性观察；动态组件自身仍保留加载中、空数据和请求失败状态。Fancybox 动态导入只在点击灯箱时执行，支持动态导入的现代浏览器可正常打开图片；如果灯箱依赖或网络失败，也只影响放大查看，不会阻断动态页面。即使本地 API 或未来 Memos 服务不可用，也只影响卡片内容，不会阻断其他页面。
 
 ## 验证与回滚
 
-专项测试确认动态侧栏使用 `client:visible`、保留三个现有 props、动态页入口和 Memos 配置传递，并且没有新增网络代码。回滚时将指令改回 `client:load` 即可，不需要修改数据层。
+专项测试确认动态侧栏使用 `client:visible`、保留三个现有 props、动态页入口和 Memos 配置传递；画廊契约测试确认没有顶层 Fancybox 静态导入，并保留点击时的动态导入。回滚时可将侧栏指令改回 `client:load`，并把画廊的动态导入恢复为静态导入；不需要修改动态数据层。当前预览还应实际检查 `/dynamic/` 能显示动态条目，以及点击图片后灯箱才发起 Fancybox 请求。

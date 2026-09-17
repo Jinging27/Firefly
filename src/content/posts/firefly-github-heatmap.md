@@ -1,7 +1,7 @@
 ---
-title: Firefly：添加客户端缓存的 GitHub 贡献热力图
+title: Firefly 魔改：添加客户端缓存的 GitHub 贡献热力图
 published: 2026-09-06
-updated: 2026-09-09
+updated: 2026-09-17
 description: 使用现有 GitHub 链接和公开数据，在 Firefly 右侧栏显示轻量贡献热力图。
 image: ""
 tags: [Firefly, GitHub, Astro, Svelte]
@@ -9,7 +9,7 @@ category: Firefly
 slug: firefly-github-heatmap
 ---
 
-GitHub 热力图适合放在侧栏，但不应该让静态博客在构建时冻结贡献数据，也不应该把 Token 放进浏览器。这个实现从现有个人资料链接提取用户名，客户端按需读取公开 JSON，并在失败时保持空状态。组件配置在右侧栏，默认只出现在宽屏非文章页。
+GitHub 热力图适合放在侧栏，但不应该让静态博客在构建时冻结贡献数据，也不应该把 Token 放进浏览器。这个实现从现有个人资料链接提取用户名，客户端按需读取公开 JSON，并在失败时保持空状态。组件配置在右侧栏，默认只出现在宽屏非文章页。右侧日历中的年度文章热力图现在默认关闭，因此两者不会重复占用同一块信息空间。
 
 ## 安全边界
 
@@ -22,6 +22,8 @@ Astro 会先输出轻量外壳，外壳中的 `client:visible` 让客户端仅�
 ## 配置与验证
 
 GitHub 用户名继续维护在 `src/config/profileConfig.ts` 的 GitHub 链接中，热力图本身不重复保存用户名。想关闭功能时，将 `src/config/sidebarConfig.ts` 中 `type: "githubHeatmap"` 的 `enable` 改为 `false`。本次实现已通过热力图数据测试 14/14、组件契约测试 5/5、开发服务器配置契约测试 1/1、Biome、`pnpm check`（224 文件）、`pnpm type-check` 和 `pnpm build`（47 页、Pagefind 29 页）。开发预览 `8789` 已验证滚动到组件后显示 9 次贡献且控制台无水合 403；生产预览已验证 1280px 真实接口返回 9 次贡献、53 周、376 格；1279px、390px 和文章页隐藏且无 GitHub 请求；1440px 亮暗主题下没有横向溢出。预览中的 Meting CORS 错误属于既有音乐接口，不影响热力图。
+
+日历的文章热力图不是 GitHub 组件的一部分。若确实需要同时查看两种年度概览，可在 `src/config/sidebarConfig.ts` 的日历专属配置中把 `showHeatmap` 改为 `true`；默认值保持 `false`，以免右侧信息重复。
 
 ## 回滚
 

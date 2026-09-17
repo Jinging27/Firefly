@@ -34,3 +34,14 @@ test("日历仍保留文章数据、切月和年度热力图入口", () => {
 	assert.match(calendarAstro, /showHeatmap/);
 	assert.match(calendarAstro, /swup:contentReplaced/);
 });
+
+test("日历默认隐藏年度文章热力图，仍保留显式开启入口", () => {
+	const calendar = sidebarLayoutConfig.rightComponents.find(
+		(component) => component.type === "calendar",
+	);
+	assert.equal(calendar?.specificConfig?.calendar?.showHeatmap, false);
+	assert.match(
+		calendarAstro,
+		/showHeatmap\s*=\s*widgetConfig\?\.specificConfig\?\.calendar\?\.showHeatmap\s*\?\?\s*false/,
+	);
+});

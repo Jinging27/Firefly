@@ -184,8 +184,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件专属配置
 			specificConfig: {
 				calendar: {
-					// 是否显示年度文章热力图
-					showHeatmap: true,
+					// 默认关闭年度文章热力图，避免与日历、时间进度和文章列表拥挤；需要时可显式开启
+					showHeatmap: false,
 				},
 			},
 		},

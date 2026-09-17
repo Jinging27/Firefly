@@ -24,7 +24,8 @@ interface Props {
 
 const { class: className, style, widgetConfig } = Astro.props;
 
-const showHeatmap = widgetConfig?.specificConfig?.calendar?.showHeatmap ?? true;
+const showHeatmap =
+	widgetConfig?.specificConfig?.calendar?.showHeatmap ?? false;
 const showTitle = widgetConfig?.showTitle !== false;
 
 // 月份名称（使用 i18n）
