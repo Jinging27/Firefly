@@ -111,6 +111,8 @@ $links | ForEach-Object { $_.Groups[1].Value }
 - `sitemap-index.xml`、`robots.txt` 和页面 Canonical 使用同一站点域名；
 - 如果只在文章正文代码示例中看到旧域名，不要误判为 RSS 链接错误，按 `<link>` 元素逐项检查。
 
+如果构建失败，先检查 `src/config/siteConfig.ts` 的 `site_url` 是否为完整的 HTTPS 地址，再确认没有把 `context.site` 或 `site_url` 改成空字符串；恢复配置后重跑 `pnpm check` 和 `pnpm build`。
+
 ## 安全与性能边界
 
 这项修改不访问任何外部 API，也不向客户端增加 JavaScript、请求、Cookie 或身份信息。它不改变 RSS 的 HTML 清洗、密码文章保护、文章排序和内容生成逻辑。

@@ -56,6 +56,8 @@ const mobile = renderAll ? [...images.mobile] : images.mobile.slice(0, 1);
 - 亮色、暗色、首页和文章页都保持原来的壁纸，不出现空白横幅或布局跳动；
 - 修改图片列表为空或只有一张时，构建仍能安全完成，不会伪造多图轮播。
 
+如果构建失败或横幅变成空白，先检查桌面/移动图片数组是否仍有有效路径，以及 `<source media>` 是否被误删；恢复最近一次布局修改后重跑专项测试和 `pnpm build`，不要为了“只显示一张”删除其余壁纸资源。
+
 scoped re-review 已确认媒体条件、`fallbackFormat` 和布局契约均保持；回滚时移除布局中的 `getRenderableBackgroundImages` 调用即可，不需要删除壁纸资源。
 
 回滚时移除布局中的 `getRenderableBackgroundImages` 调用，恢复直接使用 `getBackgroundImages()` 即可，壁纸配置与资源无需回滚。
