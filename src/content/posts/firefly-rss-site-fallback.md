@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：让 RSS 域名统一跟随站点配置
 published: 2026-09-07
+updated: 2026-09-17
 description: 清理 Firefly RSS 路由中的上游演示域名兜底，让异常路径也统一读取本站 siteConfig.site_url，并用专项测试和构建产物验证结果。
 image: ""
 tags: [Firefly, Astro, RSS, 配置]
@@ -13,6 +14,16 @@ slug: firefly-rss-site-fallback
 正常生产构建通常不会触发这个回退，因为 `astro.config.mjs` 已经向 Astro 提供本站域名。但保留第二份硬编码地址会带来维护风险：以后域名迁移、路由被独立调用，或者测试没有提供完整上下文时，RSS 就可能重新带上错误域名。
 
 这次魔改只做一件事：让 RSS 的正常路径和异常兜底都回到同一个站点配置源。
+
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时运行 `pnpm install`。这项修改只涉及 RSS 的域名兜底，不需要新增 API、环境变量或浏览器脚本。
+
+1. 打开 `src/config/siteConfig.ts`，把 `site_url` 改成你自己的正式 HTTPS 域名；
+2. 打开 `src/pages/rss.xml.ts`，确认 `context.site` 缺失时回退到 `siteConfig.site_url`，不要再写模板演示域名；
+3. 运行 `pnpm exec tsx --test src/utils/rss-site-fallback.test.ts`、`pnpm check`、`pnpm type-check` 和 `pnpm build`；
+4. 打开构建出的 `dist/rss.xml`，只检查 `<link>` 元素是否使用你的域名；文章正文里出现旧域名示例不等同于 RSS 链接泄漏；
+5. 部署后访问 `/rss.xml`、`/sitemap-index.xml` 和 `/robots.txt`，确认它们的域名一致。
 
 ## 问题在哪里
 
@@ -91,7 +102,14 @@ $links | ForEach-Object { $_.Groups[1].Value }
 
 输出的频道链接和文章链接都应使用本站域名。不能简单要求整个 XML 不出现旧字符串，因为 RSS 会收录文章正文，而本文本身就需要展示被删除的旧代码；真正需要阻止的是 `<link>` 元素指向旧域名。
 
-2026 年 9 月 7 日的实际验证结果是：专项测试 2/2 通过，`pnpm check` 检查 217 个文件且没有错误、警告或提示，`pnpm type-check` 和 `pnpm build` 退出码均为 0。构建生成 42 个页面，Pagefind 索引 24 页；`dist/rss.xml` 包含 22 个 `<link>` 元素，其中一个频道链接和 21 个文章链接全部使用 `blog.612300.xyz`，旧域名链接为 0。
+本轮专项测试 **2/2 通过**，全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。`dist/rss.xml` 的频道和文章 `<link>` 应全部使用当前 `siteConfig.site_url`，旧域名链接数量应为 0。
+
+### 改完后应该看到什么
+
+- `dist/rss.xml` 的频道链接和文章链接都以你的正式域名开头；
+- 访问 `/rss.xml` 能得到 XML，不会跳到 Firefly 上游演示域名；
+- `sitemap-index.xml`、`robots.txt` 和页面 Canonical 使用同一站点域名；
+- 如果只在文章正文代码示例中看到旧域名，不要误判为 RSS 链接错误，按 `<link>` 元素逐项检查。
 
 ## 安全与性能边界
 

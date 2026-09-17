@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：关闭远程背景视频，优先保证加载稳定
 published: 2026-09-07
+updated: 2026-09-17
 description: 记录 Firefly 如何关闭第三方远程背景视频，保留静态壁纸与播放器能力，并用配置契约和生产构建验证性能边界。
 image: ""
 tags: [Firefly, 性能, 背景视频]
@@ -9,6 +10,16 @@ slug: firefly-disable-background-video
 ---
 
 背景视频很有氛围，但它也会带来额外的网络请求、流量消耗和加载不确定性。对一个希望“不要卡顿”的博客来说，默认关闭第三方远程背景视频，是比继续依赖陌生视频地址更稳妥的选择。
+
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时运行 `pnpm install`。这项改动只处理背景播放器，不删除静态壁纸，也不需要安装新的播放器依赖。
+
+1. 打开 `src/config/backgroundWallpaper.ts`，将 `playerEnable` 设为 `false`；
+2. 删除当前配置里的第三方 `playerUrl`，不要换成另一个未经核验的远程地址；
+3. 保留 `BackgroundPlayer.astro`、类型定义和静态桌面/移动壁纸配置；
+4. 运行背景视频专项测试、`pnpm check`、`pnpm type-check` 和 `pnpm build`；
+5. 用 `pnpm dev` 打开首页，在桌面和手机宽度分别检查背景与导航栏。
 
 ## 改了什么
 
@@ -36,7 +47,16 @@ playerEnable: false,
 
 ## 如何验证
 
-项目加入了 `src/utils/background-video-config.test.ts`，验证播放器默认关闭、当前配置不含远程视频地址、播放器类型与组件能力仍保留，以及桌面/移动静态壁纸仍存在。2026 年 9 月 7 日专项测试 **4/4 通过**；`pnpm check`、`pnpm type-check`、`pnpm build` 和目标文件 Biome 检查也通过。生产构建首页未生成 `#bg-player-toggle` 按钮或 `#bg-player` 容器，且静态壁纸仍被打包。
+项目加入了 `src/utils/background-video-config.test.ts`，验证播放器默认关闭、当前配置不含远程视频地址、播放器类型与组件能力仍保留，以及桌面/移动静态壁纸仍存在。专项测试 **4/4 通过**；`pnpm check`、`pnpm type-check`、`pnpm build` 和目标文件 Biome 检查也通过。生产构建首页未生成 `#bg-player-toggle` 按钮或 `#bg-player` 容器，且静态壁纸仍被打包。
+
+本轮全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+
+### 改完后应该看到什么
+
+- 首页仍有静态桌面/移动壁纸，但导航栏不出现背景视频播放按钮；
+- Network 面板不再请求原第三方视频地址；
+- 1440px、390px、亮色和暗色模式都没有空白横幅或横向溢出；
+- 如果未来重新启用播放器，必须使用本地视频并重新完成移动端、减少动态效果和失败网络验收。
 
 ## 回滚
 

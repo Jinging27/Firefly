@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：让默认壁纸按需渲染
 published: 2026-09-08
+updated: 2026-09-17
 description: 记录 Firefly 如何在不改壁纸资源的前提下，默认只输出首张桌面和移动壁纸，并保留轮播与切换能力。
 image: ""
 tags: [Firefly, 性能, 壁纸]
@@ -9,6 +10,18 @@ slug: firefly-wallpaper-on-demand
 ---
 
 Firefly 的多图壁纸很方便，但如果轮播没有启用，页面通常只会显示其中一张。让其他图片继续出现在 HTML 中，会让浏览器下载当前视口用不到的资源。本次改造把“是否需要完整图片集合”放在构建期决定，减少默认首屏的无效图片请求。
+
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时运行 `pnpm install`。这项优化不需要删除壁纸文件，只根据轮播开关决定输出几张图片。
+
+1. 打开 `src/utils/layout-utils.ts`，确认使用 `getRenderableBackgroundImages`；
+2. 打开 `src/layouts/MainGridLayout.astro`，确认单图路径仍使用桌面/移动互斥的 `<source media>`；
+3. 默认关闭轮播且不允许访客切换时只输出首图；如果开启轮播或允许切换，必须保留完整集合；
+4. 运行壁纸专项测试、`pnpm check`、`pnpm type-check` 和 `pnpm build`；
+5. 用浏览器 Network 面板在 1440px 和 390px 分别检查请求数量。
+
+不要为了减少请求直接删除 `d1-d6` 或 `m1-m6` 资源；这样会破坏以后重新启用轮播的路径。
 
 ## 改动位置
 
@@ -34,6 +47,15 @@ const mobile = renderAll ? [...images.mobile] : images.mobile.slice(0, 1);
 
 ## 验证与回滚
 
-专项测试覆盖关闭轮播、开启轮播、允许切换、空数组和单图输入，并锁定媒体条件与轮播集合布局契约；本次结果为 6/6。全量 14 个测试文件、Biome、`pnpm check`、`pnpm type-check` 和 `pnpm build` 均通过。生产预览浏览器 Network 实测：1440px 仅请求 d1 桌面首图，390px 仅请求 m1 移动首图；文章页返回 200，亮暗主题均保持正常。scoped re-review 已确认媒体条件、验证证据和 `fallbackFormat` 语义均已补齐；布局契约测试已改为按明确代码区块提取，移除固定字符窗口和全文件任意匹配。轮播和可切换路径继续保留完整集合。
+专项测试覆盖关闭轮播、开启轮播、允许切换、空数组和单图输入，并锁定媒体条件与轮播集合布局契约；本次结果为 6/6。当前全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+
+### 改完后应该看到什么
+
+- 默认关闭轮播时，1440px 只请求桌面首图，390px 只请求移动首图；
+- 开启轮播或允许访客切换时，Network 面板可以看到完整图片集合，这是功能所需的正常开销；
+- 亮色、暗色、首页和文章页都保持原来的壁纸，不出现空白横幅或布局跳动；
+- 修改图片列表为空或只有一张时，构建仍能安全完成，不会伪造多图轮播。
+
+scoped re-review 已确认媒体条件、`fallbackFormat` 和布局契约均保持；回滚时移除布局中的 `getRenderableBackgroundImages` 调用即可，不需要删除壁纸资源。
 
 回滚时移除布局中的 `getRenderableBackgroundImages` 调用，恢复直接使用 `getBackgroundImages()` 即可，壁纸配置与资源无需回滚。

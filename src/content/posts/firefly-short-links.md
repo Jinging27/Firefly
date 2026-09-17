@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：加入安全的站点短链接
 published: 2026-08-14
+updated: 2026-09-17
 description: 用一份配置同时生成 Astro 静态跳转页和 Cloudflare 301，并限制短链路径与目标地址的安全边界。
 image: ""
 tags: [Firefly, Astro, Cloudflare, 短链接]
@@ -13,6 +14,18 @@ slug: firefly-short-links
 所以我给 Firefly 加了一层很薄的站点短链接：访客记住 `/go/github/`，实际目标仍由项目内的一份配置管理。它不依赖第三方短链服务，不新增客户端脚本，也不会在访问时发起远程查询。
 
 这次实现刻意把范围收得很窄：只支持明确列出的静态短链，只允许永久重定向 `301`，并在构建前拒绝不规范或容易产生歧义的路径。
+
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时运行 `pnpm install`。短链不需要数据库、第三方短链平台或前端脚本，所有规则都写在仓库里。
+
+1. 打开 `src/config/redirectsConfig.ts`，复制一条现有规则；
+2. 只替换 `/go/` 后的一段小写 slug 和目标地址，站内目标必须以 `/` 开头并保留尾斜杠，站外目标必须是完整 `https://` 地址；
+3. 运行 `pnpm exec tsx --test src/config/redirectsConfig.test.ts`、`pnpm check`、`pnpm type-check` 和 `pnpm build`；
+4. 检查 `dist/_redirects` 和对应的 `dist/go/<slug>/index.html`；
+5. 部署后再用 `curl.exe -I https://你的域名/go/<slug>/` 检查真实 HTTP 状态码，不要把本地 HTML 兜底当成线上 301 证据。
+
+如果只是想把文章地址变短，不要在文章 Markdown 里手写跳转，也不要把目标写成带查询串或片段的 URL。
 
 ## 当前短链放在哪里
 
@@ -175,7 +188,7 @@ dist/go/vscode/index.html
 dist/go/github/index.html
 ```
 
-本地看到 HTML 兜底和 `_redirects` 文件，只能证明构建产物正确。Cloudflare 是否实际读取规则、线上是否返回 HTTP `301`，仍要在部署完成后复核。例如使用：
+本地看到 HTML 兜底和 `_redirects` 文件，只能证明构建产物正确。本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。Cloudflare 是否实际读取规则、线上是否返回 HTTP `301`，仍要在部署完成后复核。例如使用：
 
 Windows PowerShell 中要明确调用系统自带的可执行文件，避免 `curl` 别名造成差异：
 
@@ -190,6 +203,13 @@ curl -I https://你的域名/go/github/
 ```
 
 重点检查状态码和 `Location` 响应头，不要只看浏览器最后是否到达目标页面。
+
+### 改完后应该看到什么
+
+- `dist/_redirects` 中应出现一行 `/go/你的-slug/ 目标地址 301`；目标地址会被按 source 排序。
+- `dist/go/你的-slug/index.html` 应存在，直接打开时也能跳转到目标地址，这是静态托管环境的兜底页。
+- 正式域名上执行 `curl.exe -I` 时，应看到 `301` 和正确的 `Location`；浏览器最终打开目标页不等于已经验证了状态码。
+- source 写成大写、两段路径、连续连字符，或 destination 使用 HTTP、查询串、片段时，构建应失败并指出配置错误。
 
 ## 常见错误
 

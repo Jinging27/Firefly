@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：清理未启用服务与推广残留
 published: 2026-09-07
+updated: 2026-09-17
 description: 不启用任何新服务，只移除 Firefly 配置中的示例账号、演示地址和已禁用推广素材。
 image: ""
 tags: [Firefly, 配置清理, 安全]
@@ -11,6 +12,18 @@ slug: firefly-clean-disabled-services
 Firefly 自带了评论、Memos、广告等通用能力。即使这些功能处于关闭状态，配置文件里仍可能留下上游作者、公共演示站或推广活动的地址。它们不会自动上线，但会增加误启用、隐私泄露和后续排查的风险。
 
 这次清理遵循一个边界：只删除当前站点实例不使用的示例值和素材，保留 Firefly 的功能类型、组件实现和未来恢复能力。
+
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时运行 `pnpm install`。清理的原则是“删掉当前配置里的示例值，保留功能代码”，不要直接删除整个组件目录。
+
+1. 打开 `src/config/commentConfig.ts`，没有真实评论服务时保持 `type: "none"`；
+2. 打开 `src/config/dynamicConfig.ts`，保持本地 `apiUrl: "/api/dynamic.json"`，不要把 Memos 示例地址填进去；
+3. 在 `src/config/sidebarConfig.ts` 中检查广告或推广项的 `enable` 状态，删除与本站无关的示例链接、图片和对应 LQIP；
+4. 用 `rg` 搜索示例域名，逐项确认命中是上游来源说明还是待清理配置；
+5. 运行 `pnpm check`、`pnpm type-check` 和 `pnpm build`，再打开首页、动态页和移动端。
+
+不要为了“清得干净”删除 Firefly/Fuwari 许可证、来源链接或仍被组件引用的资源。
 
 ## 清理了什么
 
@@ -53,6 +66,15 @@ apiUrl: "/api/dynamic.json",
 3. 示例域名、上游仓库标识、推广链接和广告图片不再被当前配置引用；
 4. `pnpm check`、`pnpm type-check` 和 `pnpm build` 均通过；
 5. 清理没有影响背景视频、相册、书签、品牌资源或其他未相关功能。
+
+本轮全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+
+### 改完后应该看到什么
+
+- 评论入口仍保持关闭或明确的空状态，不出现“提交评论”但无法发送的表单；
+- 动态页仍能显示本地 `/api/dynamic.json` 内容，Network 面板不请求 Memos 示例域名；
+- 首页和侧栏不再出现示例广告、推广二维码或原作者推广链接；
+- `pnpm build` 生成的 `dist/` 中没有被当前配置引用的失效广告图片。
 
 ## 如何恢复
 

@@ -11,6 +11,24 @@ slug: firefly-dynamic-lazy-hydration
 
 动态侧栏通常不是页面第一屏的核心内容，但使用 `client:load` 时，页面一打开就会初始化 Svelte 组件并请求动态数据。这个改造分成两个相互独立的边界：侧栏使用 `client:visible` 延迟水合；动态页中的图片画廊则只在用户真正打开灯箱时加载 Fancybox。这样灯箱依赖暂时不可用时，不会让动态数据组件停在“正在加载”。
 
+## 小白跟做前先准备
+
+这篇教程适合已经把 Firefly 项目跑起来、但不熟悉 Astro 水合指令的人。开始前先复制一份项目目录，或在自己的分支中操作；不要直接覆盖唯一的工作副本。项目根目录没有 `node_modules` 时先运行：
+
+```powershell
+pnpm install
+```
+
+然后按下面顺序做：
+
+1. 打开 `src/components/widget/Dynamic.astro`，把动态组件的 `client:load` 改成下文的 `client:visible`；
+2. 打开 `src/components/pages/dynamic/dynamic-gallery.ts`，确认 Fancybox 只在点击处理器中动态导入；
+3. 不要修改 `/api/dynamic.json`、Memos 配置、搜索和分页代码；
+4. 依次运行专项测试、`pnpm check`、`pnpm type-check` 和 `pnpm build`；
+5. 用 `pnpm dev` 启动预览，使用终端打印出的地址打开 `/dynamic/`。
+
+如果项目中的文件结构与这里不同，先停止操作并以当前 Firefly 版本的组件入口为准，不要把整段旧代码强行覆盖进去。
+
 ## 改动位置
 
 文件是 `src/components/widget/Dynamic.astro`，核心变化只有一处：
@@ -58,4 +76,13 @@ Astro 的 `client:visible` 负责侧栏可见性观察；动态组件自身仍�
 
 ## 验证与回滚
 
-专项测试确认动态侧栏使用 `client:visible`、保留三个现有 props、动态页入口和 Memos 配置传递；画廊契约测试确认没有顶层 Fancybox 静态导入，并保留点击时的动态导入。回滚时可将侧栏指令改回 `client:load`，并把画廊的动态导入恢复为静态导入；不需要修改动态数据层。当前预览还应实际检查 `/dynamic/` 能显示动态条目，以及点击图片后灯箱才发起 Fancybox 请求。
+专项测试确认动态侧栏使用 `client:visible`、保留三个现有 props、动态页入口和 Memos 配置传递；画廊契约测试确认没有顶层 Fancybox 静态导入，并保留点击时的动态导入。本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+
+### 改完后应该看到什么
+
+- 打开 `/dynamic/` 后，动态文字、搜索、年份筛选和分页可以正常显示；页面不应一直停在“正在加载动态”。
+- 在浏览器开发者工具的 Network 面板中，首次打开动态页不会下载 Fancybox 灯箱代码；点击一条动态里的图片后，才会出现对应的 `@fancyapps/ui` 异步块。
+- 故意让灯箱依赖加载失败时，文字动态仍然可用，只是图片不能放大；控制台最多出现灯箱警告，不应出现未处理的 Promise rejection。
+- 首页右侧动态卡片只有进入可见区域后才开始水合和请求数据；移动端或未滚动到卡片时不应提前下载动态客户端块。
+
+回滚时可将侧栏指令改回 `client:load`，并把画廊的动态导入恢复为静态导入；不需要修改动态数据层。若回滚后仍停在加载态，先检查 `/api/dynamic.json` 的响应，再检查 Fancybox，而不是把加载文案永久隐藏。

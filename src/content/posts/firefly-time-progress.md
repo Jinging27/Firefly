@@ -13,6 +13,18 @@ slug: firefly-time-progress
 
 这次调整是对原有 Firefly 时间进度魔改的完善，不改变日历切月和文章列表。为了避免右侧信息重复，年度文章热力图现在默认关闭；实现仍保留，之后可在日历专属配置中显式开启。
 
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时，在项目根目录执行 `pnpm install`。本功能不需要节日 API，也不需要在浏览器保存密钥。
+
+1. 打开 `src/config/sidebarConfig.ts`，确认右侧 `calendar` 的 `specificConfig.calendar.showHeatmap` 为 `false`；
+2. 保留 `src/components/widget/Calendar.astro`、`src/components/widget/TimeProgress.astro` 和 `src/utils/time-progress.ts` 的整体结构，不要只复制某一段 HTML；
+3. 如需增加节日，只在 `src/config/timeProgressConfig.ts` 添加已核验的日期、来源和覆盖年份，来源必须是允许的 HTTPS 官方地址；
+4. 运行时间进度专项测试，再运行 `pnpm check`、`pnpm type-check` 和 `pnpm build`；
+5. 用 `pnpm dev` 打开首页，在 1280px 和 1279px 两个宽度分别检查下面的结果。
+
+不要把春节或节假日日期写成“每年固定某一天”的 JavaScript 常量；日期变化时应更新配置并重新验证。
+
 ## 代码入口
 
 `src/utils/time-progress.ts` 提供可注入 `Date` 的纯函数：`getBeijingYearProgress`、`getBeijingMonthProgress`、`getBeijingWeekProgress`、`getNextHolidayCountdown` 和 `getNextSpringFestivalCountdown`。它们通过 UTC 时间戳加八小时计算北京时间，因此服务器和访客时区不同也不会改变结果。
@@ -44,6 +56,15 @@ calendar: {
 
 ## 验证、安全与回滚
 
-专项测试覆盖闰年、月末、周边界、周内日期编号、北京时间午夜、最近公共节日选择、春节日期、未核验来源、国务院官网白名单、Swup 延迟初始化/重复事件/清理以及刷新频率；运行时测试还驱动可用和不可用 `IntersectionObserver`、滚动离开/回到视口、`astro:page-load`、布局属性变化、页面可见性、媒体断点、隐藏属性、Swup 切页和卸载清理。组件测试确认没有 `fetch`、WebSocket，并检查隐藏暂停和 ARIA 进度条。当前专项命令为 `pnpm exec tsx --test src/utils/time-progress.test.ts src/utils/time-progress-lifecycle.test.ts src/components/widget/TimeProgress.test.ts src/components/widget/Calendar.test.ts`，结果 22/22 通过；全量测试 127/127 通过。`pnpm check`（224 文件零错误/警告/提示）、`pnpm type-check`、Biome 和 `pnpm build`（47 页面、Pagefind 29 页面）均已通过，生产预览已完成桌面、移动、文章页、亮暗色和无横向溢出检查。
+专项测试覆盖闰年、月末、周边界、周内日期编号、北京时间午夜、最近公共节日选择、春节日期、未核验来源、国务院官网白名单、Swup 延迟初始化/重复事件/清理以及刷新频率；运行时测试还驱动可用和不可用 `IntersectionObserver`、滚动离开/回到视口、`astro:page-load`、布局属性变化、页面可见性、媒体断点、隐藏属性、Swup 切页和卸载清理。组件测试确认没有 `fetch`、WebSocket，并检查隐藏暂停和 ARIA 进度条。本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+
+### 改完后应该看到什么
+
+- 在 **1280px 或更宽**的首页右侧日历中，日期导航下方应同时出现本月进度、年度进度、距离最近节日和距离春节的信息；年度文章热力图默认不出现。
+- 切换日历月份时，文章列表仍能切换，时间进度不会重复生成第二个独立卡片。
+- 在 **1279px、移动端和文章页**，不应看到这块桌面时间信息，也不应有倒计时定时器持续刷新。
+- 系统时区改成海外时，页面仍按北京时间计算；没有经过核验的节日配置应显示“暂无数据”或隐藏倒计时，而不是猜一个日期。
+
+只想恢复年度文章热力图时，把 `showHeatmap` 改回 `true`；若要撤销整套时间进度，再按计划删除日历信息区和对应配置，不能只删除页面文字留下孤立定时器。
 
 回滚本次日历整合时，删除 `Calendar.astro` 中的时间信息区和春节配置，恢复 `sidebarConfig.ts` 中的左栏 `timeProgress` 注册即可；如果只想恢复年度文章热力图，将同一文件中的 `showHeatmap` 改回 `true` 即可。如需完全移除时间进度功能，再按原计划删除时间组件、工具、生命周期协调器、配置、测试和本文，不影响每日一言或音乐组件。

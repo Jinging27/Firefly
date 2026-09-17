@@ -28,7 +28,9 @@ const appRedirectScript = `
     window.location.href = appUrl;
     return false;
   }).call(this);
-`.replace(/\s+/g, " ").trim();
+`
+	.replace(/\s+/g, " ")
+	.trim();
 ---
 
 <div class:list={["card-base", "p-3", className]} style={style}>

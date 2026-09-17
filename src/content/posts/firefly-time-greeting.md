@@ -1,6 +1,7 @@
 ---
 title: Firefly 魔改：添加零接口的本地时段问候
 published: 2026-09-08
+updated: 2026-09-17
 description: 记录 Firefly 如何用北京时间和一个可清理的定时器实现轻量时段问候，不引入图片接口、第三方脚本或持续动画。
 image: ""
 tags: [Firefly, 侧栏, 性能]
@@ -9,6 +10,16 @@ slug: firefly-time-greeting
 ---
 
 很多博客会用随机图片接口做“早安”“晚安”卡片，但这会增加外部请求、图片加载和服务失效的可能。这个版本选择更克制的实现：只根据北京时间切换本地文案，使用现有主题颜色，不依赖任何外部内容。
+
+## 小白跟做步骤
+
+先备份项目或新建分支。依赖未安装时运行 `pnpm install`。这个功能不需要图片 API、定位权限或持续动画。
+
+1. 在 `src/config/sidebarConfig.ts` 的右侧组件中确认 `type: "timeGreeting"` 且 `enable: true`；
+2. 保留 `src/components/widget/TimeGreeting.astro`、`TimeGreetingClient.svelte` 和 `src/utils/time-greeting.ts` 的配套关系；
+3. 不要把浏览器本地时间直接当作北京时间，也不要把 `setInterval` 改成永久轮询；
+4. 运行时段问候专项测试、`pnpm check`、`pnpm type-check` 和 `pnpm build`；
+5. 用 `pnpm dev` 打开首页，在 1280px、1279px 和手机宽度检查页面表现。
 
 ## 最终效果
 
@@ -56,4 +67,13 @@ slug: firefly-time-greeting
 
 ## 验证与回滚
 
-专项测试覆盖所有时段边界、北京时间换算、无效日期、下一个边界延迟、右侧栏/文章页/移动端约束以及定时器清理。回滚时删除 `timeGreeting` 的侧栏配置和对应组件文件即可，不影响其他 Firefly 魔改。
+专项测试覆盖所有时段边界、北京时间换算、无效日期、下一个边界延迟、右侧栏/文章页/移动端约束以及定时器清理。本轮全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+
+### 改完后应该看到什么
+
+- 1280px 以上的非文章页右侧顶部出现一条本地时段问候；文案按北京时间切换；
+- 1279px、手机和文章页不显示组件，不产生图片请求、接口请求或持续轮询；
+- 切换标签页、进入后台或通过 Swup 打开其他页面后，定时器会清理，不会越积越多；
+- 系统时间异常时，组件显示中性 fallback，而不是阻塞页面。
+
+回滚时只需把 `timeGreeting` 的 `enable` 改为 `false`，或者删除该配置项与组件文件；不要为了关闭它修改全局侧栏生命周期。
