@@ -42,6 +42,7 @@ CLAUDE.md
 # internal planning artifacts (keep local, do not publish)
 /docs/blog-personalization-checklist.md
 /docs/superpowers/
+/.superpowers/
 
 # lite 版本
 Firefly-Lite/
