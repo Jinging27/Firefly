@@ -62,6 +62,8 @@ const shouldShowTopHighlight =
 	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
 
 const enableBanner = backgroundWallpaper.mode === "banner";
+// 统计脚本只在正式构建中输出，避免本地开发和预览调试污染 Umami 数据。
+const isProduction = import.meta.env.PROD;
 
 // 子菜单 / 浮动面板的毛玻璃模糊度：跟随 navbar.blur，但不受壁纸模式影响，
 // 且带一个最小值 —— 导航栏可以用 blur: 0 关掉毛玻璃，面板则始终保留毛玻璃。
@@ -108,31 +110,31 @@ const siteLang = lang.replace("_", "-");
     <style is:inline>
 			@layer properties, theme, base, components, utilities;
 		</style>
-    {analyticsConfig?.googleAnalyticsId && (
-            <GoogleAnalytics analyticsId={analyticsConfig.googleAnalyticsId} />
+    {isProduction && analyticsConfig?.googleAnalyticsId && (
+      <GoogleAnalytics analyticsId={analyticsConfig.googleAnalyticsId} />
     )}
-    {analyticsConfig?.microsoftClarityId && (
-            <MicrosoftClarity clarityId={analyticsConfig.microsoftClarityId} />
+    {isProduction && analyticsConfig?.microsoftClarityId && (
+      <MicrosoftClarity clarityId={analyticsConfig.microsoftClarityId} />
     )}
-        {analyticsConfig?.umamiAnalytics?.websiteId && (
-          <UmamiAnalytics
-          websiteId={analyticsConfig.umamiAnalytics.websiteId}
-          scriptUrl={analyticsConfig.umamiAnalytics.scriptUrl}
-          replaysScriptUrl={analyticsConfig.umamiAnalytics.replaysScriptUrl}
-          trackOutboundLinks={analyticsConfig.umamiAnalytics.trackOutboundLinks}
-          collectWebVitals={analyticsConfig.umamiAnalytics.collectWebVitals}
-          replays={analyticsConfig.umamiAnalytics.replays}
-          />
-        )}
-        {analyticsConfig?.la51Analytics?.Id && (
-            <La51Analytics
-            analyticsId={analyticsConfig.la51Analytics.Id}
-            sdkUrl={analyticsConfig.la51Analytics?.sdkUrl}
-            ck={analyticsConfig.la51Analytics?.ck}
-            autoTrack={analyticsConfig.la51Analytics?.autoTrack}
-            hashMode={analyticsConfig.la51Analytics?.hashMode}
-            screenRecord={analyticsConfig.la51Analytics?.screenRecord}
-            />
+    {isProduction && analyticsConfig?.umamiAnalytics?.websiteId && (
+      <UmamiAnalytics
+        websiteId={analyticsConfig.umamiAnalytics.websiteId}
+        scriptUrl={analyticsConfig.umamiAnalytics.scriptUrl}
+        replaysScriptUrl={analyticsConfig.umamiAnalytics.replaysScriptUrl}
+        trackOutboundLinks={analyticsConfig.umamiAnalytics.trackOutboundLinks}
+        collectWebVitals={analyticsConfig.umamiAnalytics.collectWebVitals}
+        replays={analyticsConfig.umamiAnalytics.replays}
+      />
+    )}
+    {isProduction && analyticsConfig?.la51Analytics?.Id && (
+      <La51Analytics
+        analyticsId={analyticsConfig.la51Analytics.Id}
+        sdkUrl={analyticsConfig.la51Analytics?.sdkUrl}
+        ck={analyticsConfig.la51Analytics?.ck}
+        autoTrack={analyticsConfig.la51Analytics?.autoTrack}
+        hashMode={analyticsConfig.la51Analytics?.hashMode}
+        screenRecord={analyticsConfig.la51Analytics?.screenRecord}
+      />
     )}
 
     <title>{pageTitle}</title>
