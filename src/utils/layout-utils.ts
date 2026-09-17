@@ -45,6 +45,23 @@ export const getBackgroundImages = (): BackgroundImages => {
 	};
 };
 
+// 轮播未启用且不可切换时，只保留当前设备实际需要的首图，避免重叠图片被浏览器下载。
+export const getRenderableBackgroundImages = (
+	images: BackgroundImages,
+	carouselEnabled: boolean,
+	carouselSwitchable: boolean,
+): BackgroundImages => {
+	const renderAll = carouselEnabled || carouselSwitchable;
+	const desktop = renderAll ? [...images.desktop] : images.desktop.slice(0, 1);
+	const mobile = renderAll ? [...images.mobile] : images.mobile.slice(0, 1);
+
+	return {
+		desktop,
+		mobile,
+		isMultiple: renderAll ? images.isMultiple : false,
+	};
+};
+
 // 类型守卫函数
 export const isBannerSrcObject = (
 	src:

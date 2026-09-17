@@ -25,6 +25,8 @@ export const musicPlayerConfig: MusicPlayerConfig = {
 		// Meting API 地址
 		// 默认使用官方 API，也可以使用自定义 API
 		api: "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r",
+		// 主接口无响应时自动切换备用接口，避免播放器无限加载
+		requestTimeoutMs: 5000,
 		// 音乐平台：netease=网易云音乐, tencent=QQ音乐, kugou=酷狗音乐, xiami=虾米音乐, baidu=百度音乐
 		server: "netease",
 		// 类型：song=单曲, playlist=歌单, album=专辑, search=搜索, artist=艺术家

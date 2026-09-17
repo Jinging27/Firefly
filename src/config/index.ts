@@ -19,12 +19,16 @@ export type {
 	FooterConfig,
 	GalleryAlbum,
 	GalleryConfig,
+	GitHubHeatmapConfig,
 	LicenseConfig,
 	MermaidConfig,
 	MusicPlayerConfig,
 	NavBarConfig,
 	PlantUMLConfig,
 	ProfileConfig,
+	RedirectRule,
+	RedirectStatus,
+	RedirectsConfig,
 	SakuraConfig,
 	SidebarLayoutConfig,
 	SiteConfig,
@@ -49,6 +53,7 @@ export { booknavConfig, booknavPageConfig } from "./booknavConfig"; // 书签导
 // 功能配置
 export { commentConfig } from "./commentConfig"; // 评论系统配置
 export { coverImageConfig } from "./coverImageConfig"; // 封面图配置
+export { dailyQuoteConfig } from "./dailyQuoteConfig"; // 每日一言配置
 export { displaySettingsConfig } from "./displaySettingsConfig"; // 显示设置面板开关配置
 export { dynamicConfig } from "./dynamicConfig"; // 动态页面配置
 export { sakuraConfig } from "./effectsConfig"; // 动画特效配置（樱花等）
@@ -57,6 +62,7 @@ export { fontConfig, fontsList } from "./fontConfig"; // 字体配置
 export { footerConfig } from "./footerConfig"; // 页脚配置
 export { friendsPageConfig, getEnabledFriends } from "./friendsConfig"; // 友链配置
 export { galleryConfig } from "./galleryConfig"; // 相册配置
+export { githubHeatmapConfig } from "./githubHeatmapConfig"; // GitHub 贡献热力图配置
 export { licenseConfig } from "./licenseConfig"; // 许可证配置
 // 组件配置
 export { mermaidConfig } from "./mermaidConfig"; // Mermaid 图表配置
@@ -65,8 +71,14 @@ export { navBarConfig, navBarSearchConfig } from "./navBarConfig"; // 导航栏�
 export { live2dWidgetConfig, spineModelConfig } from "./pioConfig"; // 看板娘配置
 export { plantumlConfig } from "./plantumlConfig"; // PlantUML 图表配置
 export { profileConfig } from "./profileConfig"; // 用户资料配置
+export {
+	defineRedirectsConfig,
+	redirectsConfig,
+	serializeCloudflareRedirects,
+} from "./redirectsConfig"; // 短链接配置
 // 布局配置
 export { sidebarLayoutConfig } from "./sidebarConfig"; // 侧边栏布局配置
 // 核心配置
 export { siteConfig } from "./siteConfig"; // 站点基础配置
 export { sponsorConfig } from "./sponsorConfig"; // 打赏配置
+export { timeProgressConfig } from "./timeProgressConfig"; // 时间进度配置

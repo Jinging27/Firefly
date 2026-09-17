@@ -1,0 +1,49 @@
+---
+import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import GitHubHeatmapClient from "@/components/widget/GitHubHeatmapClient.svelte";
+import { githubHeatmapConfig, profileConfig } from "@/config";
+import type { WidgetComponentConfig } from "@/types/config";
+import { parseGitHubUsername } from "@/utils/github-heatmap";
+
+interface Props {
+	class?: string;
+	style?: string;
+	widgetConfig?: WidgetComponentConfig;
+}
+
+const { class: className, style, widgetConfig } = Astro.props;
+const githubLink = profileConfig.links.find(
+	(link) => link.name.toLowerCase() === "github",
+);
+const username = githubLink ? parseGitHubUsername(githubLink.url) : null;
+const showTitle = widgetConfig?.showTitle !== false;
+const widgetClass = [className, "github-heatmap-widget"]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<WidgetLayout
+	name={githubHeatmapConfig.title}
+	{showTitle}
+	id="github-heatmap"
+	class={widgetClass}
+	{style}
+>
+	<GitHubHeatmapClient
+		client:visible
+		config={githubHeatmapConfig}
+		username={username}
+	/>
+</WidgetLayout>
+
+<style>
+	:global(.github-heatmap-widget) {
+		display: none;
+	}
+
+	@media (min-width: 1280px) {
+		:global(.github-heatmap-widget:not(.hidden)) {
+			display: block;
+		}
+	}
+</style>

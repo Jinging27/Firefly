@@ -135,10 +135,16 @@ const managerConfigStr = JSON.stringify({
         if (!config.meting) return;
         var m = config.meting;
         var apis = [m.api].concat(m.fallbackApis || []);
+        var configuredTimeout = Number(m.requestTimeoutMs);
+        var timeoutMs = Number.isFinite(configuredTimeout)
+            ? Math.min(Math.max(configuredTimeout, 1000), 15000)
+            : 5000;
 
         for (var i = 0; i < apis.length; i++) {
             var baseApi = apis[i];
             if (!baseApi) continue;
+            var controller = new AbortController();
+            var timeout = setTimeout(function () { controller.abort(); }, timeoutMs);
             try {
                 var fetchUrl = baseApi
                     .replace(':server', m.server)
@@ -147,7 +153,7 @@ const managerConfigStr = JSON.stringify({
                     .replace(':r', Math.random());
                 if (m.auth) fetchUrl += '&auth=' + m.auth;
 
-                var res = await fetch(fetchUrl);
+                var res = await fetch(fetchUrl, { signal: controller.signal });
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 var data = await res.json();
 
@@ -165,6 +171,8 @@ const managerConfigStr = JSON.stringify({
                 }
             } catch (e) {
                 console.warn('Meting API failed for ' + baseApi, e);
+            } finally {
+                clearTimeout(timeout);
             }
         }
         throw new Error('All Meting APIs failed');

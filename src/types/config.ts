@@ -9,6 +9,12 @@ export type {
 } from "./booknavConfig";
 export type { CommentConfig } from "./commentConfig";
 export type { CoverImageConfig } from "./coverImageConfig";
+export type {
+	DailyQuote,
+	DailyQuoteCacheRecord,
+	DailyQuoteConfig,
+	StorageLike,
+} from "./dailyQuoteConfig";
 export type { DisplaySettingsConfig } from "./displaySettingsConfig";
 export type { DynamicConfig } from "./dynamicConfig";
 export type { SakuraConfig } from "./effectsConfig";
@@ -22,6 +28,11 @@ export type { FontSelectionConfig } from "./fontConfig";
 export type { FooterConfig } from "./footerConfig";
 export type { FriendLink, FriendsPageConfig } from "./friendsConfig";
 export type { GalleryAlbum, GalleryConfig } from "./galleryConfig";
+export type {
+	GitHubContributionData,
+	GitHubContributionDay,
+	GitHubHeatmapConfig,
+} from "./githubHeatmapConfig";
 export type { LicenseConfig } from "./licenseConfig";
 export type { MermaidConfig } from "./mermaidConfig";
 export type { MusicPlayerConfig } from "./musicConfig";
@@ -34,6 +45,11 @@ export type {
 export type { Live2DWidgetConfig, SpineModelConfig } from "./pioConfig";
 export type { PlantUMLConfig } from "./plantumlConfig";
 export type { ProfileConfig } from "./profileConfig";
+export type {
+	RedirectRule,
+	RedirectStatus,
+	RedirectsConfig,
+} from "./redirectsConfig";
 export type {
 	AdConfig,
 	CalendarConfig,
@@ -55,6 +71,7 @@ export type {
 	SponsorItem,
 	SponsorMethod,
 } from "./sponsorConfig";
+export type { Holiday, TimeProgressConfig } from "./timeProgressConfig";
 
 // 响应式图像布局类型
 export type ResponsiveImageLayout = "constrained" | "full-width" | "none";

@@ -225,6 +225,12 @@ importers:
       '@types/sanitize-html':
         specifier: ^2.16.1
         version: 2.16.1
+      css-select:
+        specifier: 5.2.2
+        version: 5.2.2
+      htmlparser2:
+        specifier: 10.1.0
+        version: 10.1.0
       pinyin-pro:
         specifier: ^3.28.2
         version: 3.28.2

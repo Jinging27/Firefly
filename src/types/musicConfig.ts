@@ -23,6 +23,9 @@ export type MusicPlayerConfig = {
 		// Meting API 地址
 		api?: string;
 
+		// 每个 Meting API 请求的超时时间（毫秒）
+		requestTimeoutMs?: number;
+
 		// 音乐平台：netease=网易云音乐, tencent=QQ音乐, kugou=酷狗音乐, xiami=虾米音乐, baidu=百度音乐
 		server?: "netease" | "tencent" | "kugou" | "xiami" | "baidu";
 

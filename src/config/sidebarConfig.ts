@@ -69,6 +69,16 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			showOnPostPage: true,
 		},
 		{
+			// 组件类型：每日一言组件
+			type: "dailyQuote",
+			// 是否启用该组件
+			enable: true,
+			// 组件位置
+			position: "sticky",
+			// 是否在文章详情页显示
+			showOnPostPage: false,
+		},
+		{
 			// 组件类型：分类组件
 			type: "categories",
 			// 是否启用该组件
@@ -147,6 +157,20 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			},
 		},
 		{
+			// 组件类型：GitHub 贡献热力图
+			type: "githubHeatmap",
+			enable: true,
+			position: "top",
+			showOnPostPage: false,
+		},
+		{
+			// 组件类型：本地纯色版时段问候
+			type: "timeGreeting",
+			enable: true,
+			position: "top",
+			showOnPostPage: false,
+		},
+		{
 			// 组件类型：日历组件
 			type: "calendar",
 			// 是否启用该组件
@@ -160,8 +184,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件专属配置
 			specificConfig: {
 				calendar: {
-					// 是否显示年度文章热力图
-					showHeatmap: true,
+					// 默认关闭年度文章热力图，避免与日历、时间进度和文章列表拥挤；需要时可显式开启
+					showHeatmap: false,
 				},
 			},
 		},
@@ -176,62 +200,6 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			showOnPostPage: true,
 			// 是否在非文章详情页隐藏
 			hideOnNonPostPage: true,
-		},
-		{
-			// 组件类型：广告栏组件 1
-			type: "advertisement",
-			// 是否启用该组件
-			enable: false,
-			// 是否显示组件标题
-			showTitle: false,
-			// 组件位置
-			position: "sticky",
-			// 是否在文章详情页显示
-			showOnPostPage: true,
-			// 组件专属配置（广告内容直接在此配置）
-			specificConfig: {
-				ad: {
-					image: {
-						src: "/assets/images/ad/ad1.webp",
-						alt: "广告横幅",
-						link: "https://haoka.lot-ml.com/plugreg.html?agentid=1423316",
-						external: true,
-					},
-					// 是否允许关闭广告
-					closable: false,
-					// 显示次数限制，-1为无限制
-					displayCount: -1,
-					// 组件内边距配置
-					padding: {
-						all: "1rem",
-					},
-				},
-			},
-		},
-		{
-			// 组件类型：广告栏组件 2
-			type: "advertisement",
-			// 是否启用该组件
-			enable: false,
-			// 组件位置
-			position: "sticky",
-			// 是否在文章详情页显示
-			showOnPostPage: true,
-			// 组件专属配置（广告内容直接在此配置）
-			specificConfig: {
-				ad: {
-					title: "支持博主",
-					content:
-						"如果您觉得本站内容对您有帮助，欢迎支持我们的创作！您的支持是我们持续更新的动力。",
-					link: {
-						text: "支持一下",
-						url: "about/",
-						external: false,
-					},
-					closable: false,
-					displayCount: -1,
-				},
-			},
 		},
 	],
 

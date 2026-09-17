@@ -1,0 +1,43 @@
+---
+import WidgetLayout from "@/components/common/WidgetLayout.astro";
+import DailyQuoteClient from "@/components/widget/DailyQuoteClient.svelte";
+import { dailyQuoteConfig } from "@/config";
+import type { WidgetComponentConfig } from "@/types/config";
+
+interface Props {
+	class?: string;
+	style?: string;
+	widgetConfig?: WidgetComponentConfig;
+}
+
+const { class: className, style, widgetConfig } = Astro.props;
+const showTitle = widgetConfig?.showTitle !== false;
+const widgetClass = [className, "daily-quote-widget"].filter(Boolean).join(" ");
+---
+
+<WidgetLayout
+	name={dailyQuoteConfig.title}
+	{showTitle}
+	id="daily-quote"
+	class={widgetClass}
+	{style}
+>
+	<DailyQuoteClient client:visible config={dailyQuoteConfig} />
+</WidgetLayout>
+
+<style>
+	:global(widget-layout[data-id="daily-quote"] #daily-quote) {
+		font-family:
+			"Kaiti SC", "STKaiti", "KaiTi", "楷体", "DFKai-SB", "BiauKai", serif;
+	}
+
+	:global(.daily-quote-widget) {
+		display: none;
+	}
+
+	@media (min-width: 1280px) {
+		:global(.daily-quote-widget:not(.hidden)) {
+			display: block;
+		}
+	}
+</style>

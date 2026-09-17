@@ -1,4 +1,7 @@
 import { setMaxListeners } from "node:events";
+import { realpathSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 import cloudflare from "@astrojs/cloudflare";
 import { unified } from "@astrojs/markdown-remark";
 import mdx from "@astrojs/mdx";
@@ -32,6 +35,8 @@ import {
 	fontsList,
 	mermaidConfig,
 	plantumlConfig,
+	redirectsConfig,
+	serializeCloudflareRedirects,
 	siteConfig,
 } from "./src/config";
 import I18nKey from "./src/i18n/i18nKey";
@@ -53,6 +58,15 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import { remarkWikiLink } from "./src/plugins/remark-wiki-link.js";
 import { collectUsedFontCssVars } from "./src/utils/fontHelper";
 
+const workspaceRoot = process.cwd();
+const realNodeModules = (() => {
+	try {
+		return realpathSync(resolve(workspaceRoot, "node_modules"));
+	} catch {
+		return resolve(workspaceRoot, "node_modules");
+	}
+})();
+
 if (process.env.NODE_ENV === "development") {
 	setMaxListeners(20);
 }
@@ -63,12 +77,26 @@ const adapter = process.env.CF_WORKERS
 		})
 	: undefined;
 
+const cloudflareRedirectsIntegration = {
+	name: "firefly-cloudflare-redirects",
+	hooks: {
+		"astro:build:done": async ({ dir }) => {
+			await writeFile(
+				new URL("_redirects", dir),
+				serializeCloudflareRedirects(redirectsConfig),
+				"utf8",
+			);
+		},
+	},
+};
+
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
 
 	base: "/",
 	trailingSlash: "always",
+	redirects: redirectsConfig,
 
 	// 字体配置 - 只加载实际使用的字体，跳过未引用的以加快构建
 	fonts: (() => {
@@ -115,6 +143,7 @@ export default defineConfig({
 	},
 
 	integrations: [
+		cloudflareRedirectsIntegration,
 		swup({
 			theme: false,
 			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
@@ -334,6 +363,11 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
 		server: {
+			fs: {
+				// pnpm 工作树中的 node_modules 通常是指向共享依赖目录的链接；
+				// 显式允许其真实路径，避免开发环境水合模块被 Vite 以 403 拒绝。
+				allow: [workspaceRoot, realNodeModules],
+			},
 			watch: {
 				ignored: ["**/package/**", "**/Firefly-docs/**"],
 			},

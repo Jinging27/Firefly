@@ -55,6 +55,7 @@ package/
 coverage/
 playwright-report/
 test-results/
+/.playwright-cli/
 Thumbs.db
 desktop.ini
 
