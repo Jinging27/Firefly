@@ -66,6 +66,8 @@ QQ、GitHub、邮箱、网易云音乐和 RSS 都从这里生成。QQ 使用 `te
 
 当前音乐配置的 `mode: "meting"` 会让浏览器直连第三方 Meting API。如果对方响应没有允许本站来源的 `Access-Control-Allow-Origin` 响应头，浏览器会拦截响应并在控制台显示 CORS 错误。它通常只影响歌单、歌词或封面加载，不会阻塞 Astro 构建、文章、日历、每日一言或动态页，也不代表 Token 泄露。
 
+播放器现在还会对每个 Meting 接口设置 5 秒超时。主接口无响应时会自动中止并尝试 `fallbackApis`，因此不能只根据一次 CORS 或网络报错就判断整个播放器失效。具体配置和 Network 验收步骤见[音乐接口超时降级教程](/posts/firefly-music-meting-fallback/)。
+
 如果音乐必须稳定，最简单的回退是把 `src/config/musicConfig.ts` 的 `mode` 改成 `"local"`，并填写 `local.playlist`；这会停止 Meting 请求，但需要自己准备音频、封面和歌词文件。不要在浏览器端加入绕过 CORS 的代理扩展，也不要把陌生的公共代理地址直接写进生产配置。
 
 ## 验证方法
@@ -93,7 +95,7 @@ pnpm build
 - 首页标题、浏览器标签页和 RSS 域名使用 `siteConfig.site_url`；
 - 头像、简介和个人链接显示的是自己的资料；
 - 关于页、友链页、赞赏页和 404 页没有原作者的账号或模板推广入口；
-- 1440px 和 390px 预览都没有横向滚动条；音乐接口若 CORS 失败，其他页面仍能正常加载。
+- 1440px 和 390px 预览都没有横向滚动条；音乐接口若 CORS 或超时，播放器会结束加载态，其他页面仍能正常加载。
 
 ## 回滚
 
