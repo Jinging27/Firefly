@@ -102,7 +102,7 @@ $links | ForEach-Object { $_.Groups[1].Value }
 
 输出的频道链接和文章链接都应使用本站域名。不能简单要求整个 XML 不出现旧字符串，因为 RSS 会收录文章正文，而本文本身就需要展示被删除的旧代码；真正需要阻止的是 `<link>` 元素指向旧域名。
 
-本轮专项测试 **2/2 通过**，全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。`dist/rss.xml` 的频道和文章 `<link>` 应全部使用当前 `siteConfig.site_url`，旧域名链接数量应为 0。
+本轮专项测试 **2/2 通过**，全量测试 **138/138 通过**；`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。`dist/rss.xml` 的频道和文章 `<link>` 应全部使用当前 `siteConfig.site_url`，旧域名链接数量应为 0。
 
 ### 改完后应该看到什么
 

@@ -56,7 +56,7 @@ calendar: {
 
 ## 验证、安全与回滚
 
-专项测试覆盖闰年、月末、周边界、周内日期编号、北京时间午夜、最近公共节日选择、春节日期、未核验来源、国务院官网白名单、Swup 延迟初始化/重复事件/清理以及刷新频率；运行时测试还驱动可用和不可用 `IntersectionObserver`、滚动离开/回到视口、`astro:page-load`、布局属性变化、页面可见性、媒体断点、隐藏属性、Swup 切页和卸载清理。组件测试确认没有 `fetch`、WebSocket，并检查隐藏暂停和 ARIA 进度条。本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+专项测试覆盖闰年、月末、周边界、周内日期编号、北京时间午夜、最近公共节日选择、春节日期、未核验来源、国务院官网白名单、Swup 延迟初始化/重复事件/清理以及刷新频率；运行时测试还驱动可用和不可用 `IntersectionObserver`、滚动离开/回到视口、`astro:page-load`、布局属性变化、页面可见性、媒体断点、隐藏属性、Swup 切页和卸载清理。组件测试确认没有 `fetch`、WebSocket，并检查隐藏暂停和 ARIA 进度条。本轮全量测试 **138/138 通过**，`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。
 
 ### 改完后应该看到什么
 

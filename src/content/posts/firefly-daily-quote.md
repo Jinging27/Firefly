@@ -218,7 +218,7 @@ pnpm type-check
 pnpm build
 ```
 
-本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+本轮全量测试 **138/138 通过**，`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。
 
 ### 改完后应该看到什么
 
@@ -229,10 +229,12 @@ pnpm build
 
 如果接口在控制台显示 CORS、超时或非 2xx，先确认页面仍显示 fallback。只有 fallback 也消失时才检查 `dailyQuoteConfig.ts` 的字段，不能为了消除控制台错误而关闭文本安全校验。
 
-## 想改内容或关闭怎么办
+## 修改、关闭与回滚
 
 修改默认句子和出处，编辑 `src/config/dailyQuoteConfig.ts` 里的 `fallback`。
 
 暂时关闭功能则去 `src/config/sidebarConfig.ts` 找到 `type: "dailyQuote"`，把 `enable` 改成 `false`。关闭后组件不会渲染，在线请求自然也不会发生。
+
+如果要回滚整项功能，先把 `enable` 改回 `false`，再删除 `src/components/widget/DailyQuote.astro`、`src/components/widget/DailyQuoteClient.svelte`、`src/config/dailyQuoteConfig.ts` 和 `src/utils/daily-quote.ts`，同时移除 `sidebarConfig.ts` 中的 `dailyQuote` 条目。删除后重新运行专项测试、`pnpm check`、`pnpm type-check` 和 `pnpm build`，不要只删组件而留下配置引用。
 
 这次没有加刷新按钮、切换动画和多接口轮询。标题安静地融入侧栏，正文保留正楷阅读感，每日一言偶尔换一句话，就够了。

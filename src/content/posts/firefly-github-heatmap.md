@@ -33,7 +33,7 @@ Astro 会先输出轻量外壳，外壳中的 `client:visible` 让客户端仅�
 
 ## 配置与验证
 
-GitHub 用户名继续维护在 `src/config/profileConfig.ts` 的 GitHub 链接中，热力图本身不重复保存用户名。想关闭功能时，将 `src/config/sidebarConfig.ts` 中 `type: "githubHeatmap"` 的 `enable` 改为 `false`。本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+GitHub 用户名继续维护在 `src/config/profileConfig.ts` 的 GitHub 链接中，热力图本身不重复保存用户名。想关闭功能时，将 `src/config/sidebarConfig.ts` 中 `type: "githubHeatmap"` 的 `enable` 改为 `false`。本轮全量测试 **138/138 通过**，`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。
 
 ### 改完后应该看到什么
 

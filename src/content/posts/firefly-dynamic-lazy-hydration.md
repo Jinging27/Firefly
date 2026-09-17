@@ -76,7 +76,7 @@ Astro 的 `client:visible` 负责侧栏可见性观察；动态组件自身仍�
 
 ## 验证与回滚
 
-专项测试确认动态侧栏使用 `client:visible`、保留三个现有 props、动态页入口和 Memos 配置传递；画廊契约测试确认没有顶层 Fancybox 静态导入，并保留点击时的动态导入。本轮全量测试 **136/136 通过**，`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+专项测试确认动态侧栏使用 `client:visible`、保留三个现有 props、动态页入口和 Memos 配置传递；画廊契约测试确认没有顶层 Fancybox 静态导入，并保留点击时的动态导入。本轮全量测试 **138/138 通过**，`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。
 
 ### 改完后应该看到什么
 

@@ -37,7 +37,14 @@ playerEnable: false,
 
 换一个远程地址并不能解决根本问题：来源稳定性、跨域、带宽、版权和服务条款都可能变化。当前改造不把新的第三方地址写进配置，也不加入自动播放脚本，避免为了视觉效果扩大运行时风险。
 
-如果以后确实需要视频，可以把文件放进 `public/assets/videos/`，再在配置中显式启用，并重新检查移动端、亮暗主题、减少动态效果和网络失败场景。
+如果以后确实需要视频，可以先在项目根目录用 PowerShell 创建目录并复制自己拥有的视频：
+
+```powershell
+New-Item -ItemType Directory -Force public/assets/videos
+Copy-Item .\你的文件名.mp4 public/assets/videos/firefly.mp4
+```
+
+然后在 `src/config/backgroundWallpaper.ts` 中填写 `playerUrl: "/assets/videos/firefly.mp4"` 并显式启用。重新检查移动端、亮暗主题、减少动态效果和网络失败场景。
 
 ## 性能与安全边界
 
@@ -49,7 +56,7 @@ playerEnable: false,
 
 项目加入了 `src/utils/background-video-config.test.ts`，验证播放器默认关闭、当前配置不含远程视频地址、播放器类型与组件能力仍保留，以及桌面/移动静态壁纸仍存在。专项测试 **4/4 通过**；`pnpm check`、`pnpm type-check`、`pnpm build` 和目标文件 Biome 检查也通过。生产构建首页未生成 `#bg-player-toggle` 按钮或 `#bg-player` 容器，且静态壁纸仍被打包。
 
-本轮全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+本轮全量测试 **138/138 通过**；`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。
 
 ### 改完后应该看到什么
 

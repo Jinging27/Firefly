@@ -67,7 +67,7 @@ slug: firefly-time-greeting
 
 ## 验证与回滚
 
-专项测试覆盖所有时段边界、北京时间换算、无效日期、下一个边界延迟、右侧栏/文章页/移动端约束以及定时器清理。本轮全量测试 **136/136 通过**；`pnpm check` 检查 **228 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **47 个页面**，Pagefind 索引 **29 个页面**。
+专项测试覆盖所有时段边界、北京时间换算、无效日期、下一个边界延迟、右侧栏/文章页/移动端约束以及定时器清理。本轮全量测试 **138/138 通过**；`pnpm check` 检查 **229 个文件且为 0 errors、0 warnings、0 hints**，`pnpm type-check` 和 `pnpm build` 通过；生产构建生成 **48 个页面**，Pagefind 索引 **30 个页面**。
 
 ### 改完后应该看到什么
 
