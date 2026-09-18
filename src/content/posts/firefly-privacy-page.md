@@ -41,7 +41,7 @@ git status --short --branch
 
 ### 2. 创建正文内容
 
-新建 `src/content/spec/privacy.md`，建议按“先看结论—当前功能状态—数据边界—访客可以怎么做”的顺序说明：
+新建 `src/content/spec/privacy.md`，建议按“写在前面—当前功能状态—数据边界—访客可以怎么做”的顺序说明：
 
 1. 页面更新时间和说明范围；
 2. Umami 当前开启的页面访问、外链点击和 Web Vitals；
@@ -117,7 +117,7 @@ Select-String -Path dist/privacy/index.html -Pattern "隐私说明|Umami|Giscus|
 ## 改完后应该看到什么
 
 - 打开 `/privacy/` 后，页面卡片标题为“隐私说明”；
-- 正文开头先看到“先看结论”和当前功能状态表；
+- 正文开头先看到“写在前面”和当前功能状态表；
 - 正文还应说明浏览器 `localStorage` 偏好、加密内容的 `sessionStorage` 会话缓存、Giscus 公开评论和 Memos 关闭状态；
 - 首页、文章页、留言页等带页脚的页面都能看到“隐私说明”；
 - 点击链接后地址为 `/privacy/`，不是外部站点；

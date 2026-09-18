@@ -17,7 +17,7 @@ const footerSource = readFileSync(
 
 test("隐私说明覆盖当前第三方服务边界", () => {
 	for (const phrase of [
-		"先看结论",
+		"写在前面",
 		"当前功能状态",
 		"Umami",
 		"Giscus",
